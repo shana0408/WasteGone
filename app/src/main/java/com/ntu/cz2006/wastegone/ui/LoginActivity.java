@@ -89,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
 
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Intent i = new Intent(getApplicationContext(),MapsActivity.class);
+                            Intent i = new Intent(getApplicationContext(),ProfileActivity.class);
                             startActivity(i);
                             Toast.makeText(getApplicationContext(),"User Logged in ", Toast.LENGTH_SHORT).show();
 
