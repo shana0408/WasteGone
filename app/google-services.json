@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "741250666186",
+    "firebase_url": "https://cz2006-wastegone-1548297020479.firebaseio.com",
+    "project_id": "cz2006-wastegone-1548297020479",
+    "storage_bucket": "cz2006-wastegone-1548297020479.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741250666186:android:8ff55e0e25011d4b",
+        "android_client_info": {
+          "package_name": "com.ntu.cz2006.wastegone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741250666186-2t4u5bi131h0k6huo0tnpbm27rf4444d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ntu.cz2006.wastegone",
+            "certificate_hash": "e26e6dbf20b0944fbdde1bea0ada07211ee8a93f"
+          }
+        },
+        {
+          "client_id": "741250666186-jqsl6h94kfqep1oa2m4ne61je2nhmucu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKR63qNPTMGEynsCXlTsqdB2w6NFXjHtg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "741250666186-jqsl6h94kfqep1oa2m4ne61je2nhmucu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
