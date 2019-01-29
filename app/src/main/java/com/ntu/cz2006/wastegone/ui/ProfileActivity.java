@@ -35,6 +35,7 @@ public class ProfileActivity extends AppCompatActivity {
         DatabaseReference myRef = database.getReference(acct.getId().toString());
 
         myRef.setValue(2);
+        //test
 
 
 
