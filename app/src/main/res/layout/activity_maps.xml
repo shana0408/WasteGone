@@ -6,7 +6,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="false">
 
     <android.support.design.widget.NavigationView
         android:layout_width="match_parent"
@@ -14,11 +14,12 @@
         android:layout_gravity="start">
     </android.support.design.widget.NavigationView>
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    <fragment
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <android.support.design.widget.CoordinatorLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -29,27 +30,28 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_gravity="top|end"
+            android:orientation="vertical"
             app:layout_anchor="@id/bottomSheet"
-            app:layout_anchorGravity="top|end">
+            app:layout_anchorGravity="top|end"
+            android:fitsSystemWindows="true">
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/myLocationButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
-                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:src="@drawable/ic_mylocation"
                 app:backgroundTint="#FFFFFF" />
 
             <android.support.design.widget.FloatingActionButton
-                android:id="@+id/bottomSheetButton"
+                android:id="@+id/toggleBottomSheetButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
-                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:src="@drawable/ic_addlocation"
                 app:backgroundTint="#FFFFFF" />
@@ -58,8 +60,5 @@
         <include layout="@layout/bottom_sheet" />
 
     </android.support.design.widget.CoordinatorLayout>
-
-
-
 
 </android.support.v4.widget.DrawerLayout>

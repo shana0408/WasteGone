@@ -3,25 +3,23 @@ package com.ntu.cz2006.wastegone.ui;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.location.Location;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
-import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,12 +29,24 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.ntu.cz2006.wastegone.R;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Nullable;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private static final String TAG = "MapsActivity";
@@ -46,7 +56,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private GoogleMap mMap;
-    private BottomSheetBehavior sheetBehavior;
+    private Location mLastLocation;
+    private BottomSheetBehavior mBottomSheetBehavior;
+    private FloatingActionButton myLocationButton;
+    private FloatingActionButton toggleBottomSheetButton;
+    private LinearLayout bottomSheet;
+    private Button submitRequestButton;
+    private Spinner categorySpinner;
+    private EditText remarksInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,11 +72,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mFusedLocationProviderClient = new FusedLocationProviderClient(this);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        initButtonListener();
+        initButton();
+        loadCategoryIntoSpinner();
     }
 
     @Override
@@ -77,8 +94,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onComplete(@NonNull Task<Location> task) {
                 if (task.isSuccessful()) {
-                    Location location = task.getResult();
-                    LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
+                    mLastLocation = task.getResult();
+                    LatLng latlng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                     CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latlng, DEFAULT_ZOOM);
                     mMap.moveCamera(cameraUpdate);
                 }
@@ -88,12 +105,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         showWasteOnMap();
     }
 
-    private void initButtonListener() {
-        FloatingActionButton myLocationButton = findViewById(R.id.myLocationButton);
-        FloatingActionButton bottomSheetButton = findViewById(R.id.bottomSheetButton);
-        LinearLayout bottomSheet = findViewById(R.id.bottomSheet);
+    private void initButton() {
+        myLocationButton = findViewById(R.id.myLocationButton);
+        toggleBottomSheetButton = findViewById(R.id.toggleBottomSheetButton);
+        bottomSheet = findViewById(R.id.bottomSheet);
+        submitRequestButton = findViewById(R.id.submitRequestButton);
+        categorySpinner = findViewById(R.id.categorySpinner);
+        remarksInput = findViewById(R.id.remarksInput);
 
-        sheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
         myLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,20 +122,84 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        bottomSheetButton.setOnClickListener(new View.OnClickListener() {
+        toggleBottomSheetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-                    sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                }
-                else {
-                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                if (mBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                } else {
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
             }
         });
 
+        submitRequestButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                submitWasteRequest();
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                remarksInput.setText("");
+            }
+        });
+
     }
-    
+
+    private void showWasteOnMap() {
+        db.collection("WasteLocation")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            WasteLocation wasteLocation = document.toObject(WasteLocation.class);
+                            LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+                            mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                        }
+                    }
+                });
+
+        db.collection("WasteLocation")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            return;
+                        }
+
+                        for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
+                                    LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+                                    mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                                case REMOVED:
+                                    return;
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void loadCategoryIntoSpinner() {
+        db.collection("WasteCategory")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        ArrayList<String> categoryList = new ArrayList<String>();
+
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String description = document.getString("description");
+                            categoryList.add(description);
+                        }
+
+                        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(MapsActivity.this, android.R.layout.simple_spinner_item, categoryList);
+                        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        categorySpinner.setAdapter(categoryAdapter);
+                    }
+                });
+    }
+
     @SuppressLint("MissingPermission")
     private void animateCameraToCurrentLocation() {
         mFusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
@@ -132,22 +216,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void showWasteOnMap() {
-        db.collection("WasteLocation")
-            .get()
-            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        WasteLocation wasteLocation;
 
-                        wasteLocation = document.toObject(WasteLocation.class);
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
 
-                        LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+                Rect outRect = new Rect();
+                Rect buttonRect = new Rect();
+                bottomSheet.getGlobalVisibleRect(outRect);
+                toggleBottomSheetButton.getGlobalVisibleRect(buttonRect);
 
-                        mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                if (!outRect.contains((int) event.getRawX(), (int) event.getRawY())
+                        && !buttonRect.contains((int) event.getRawX(), (int) event.getRawY()))
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        }
+
+        return super.dispatchTouchEvent(event);
+    }
+
+    private void submitWasteRequest() {
+        Map<String, Object> wasteLocation = new HashMap<String, Object>();
+        GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        wasteLocation.put("geo_point", geoPoint);
+        wasteLocation.put("category", categorySpinner.getSelectedItem().toString());
+        wasteLocation.put("remarks", remarksInput.getText().toString());
+
+        db.collection("WasteLocation").document()
+                .set(wasteLocation)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(MapsActivity.this, "WasteLocation added", Toast.LENGTH_SHORT).show();
                     }
-                }
-            });
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(MapsActivity.this, "Unable to add", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }
