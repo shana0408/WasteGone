@@ -16,6 +16,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -28,10 +30,16 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean mLocationPermissionGranted = false;
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+//        GoogleSignInAccount googleAccount = GoogleSignIn.getLastSignedInAccount(this);
+//        if (googleAccount == null) {
+//            Log.d(TAG, "onCreate: Google Account not login");
+//            signInGoogleAccount();
+//        }
+
         if (checkMapService()) {
             if (mLocationPermissionGranted) {
                 openMap();
@@ -39,6 +47,12 @@ public class MainActivity extends AppCompatActivity {
                 getLocationPermission();
             }
         }
+    }
+
+    private void signInGoogleAccount() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     public boolean checkMapService() {
@@ -120,19 +134,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult: called.");
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ENABLE_GPS: {
-                onResume();
-            }
-        }
-    }
-
     private void openMap() {
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
     }
+
 }

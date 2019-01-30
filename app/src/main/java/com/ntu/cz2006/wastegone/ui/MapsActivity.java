@@ -1,15 +1,24 @@
 package com.ntu.cz2006.wastegone.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,11 +38,11 @@ import com.ntu.cz2006.wastegone.models.WasteLocation;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private static final String TAG = "MapsActivity";
     private static final int DEFAULT_ZOOM = 17;
-    private GoogleMap mMap;
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
-
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +84,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void initButtonListener() {
-        Button locationButton = findViewById(R.id.myLocationButton);
-        Button categoryButton = findViewById(R.id.categoryButton);
+        FloatingActionButton locationButton = findViewById(R.id.myLocationButton);
+
+//        profileButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                DrawerLayout mDrawerLayout = findViewById(R.id.drawer_layout);
+//                mDrawerLayout.openDrawer(GravityCompat.START);
+//            }
+//        });
 
         locationButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,16 +100,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 animateCameraToCurrentLocation();
             }
         });
-
-        categoryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
     }
     
+    @SuppressLint("MissingPermission")
     private void animateCameraToCurrentLocation() {
         mFusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
             @Override
