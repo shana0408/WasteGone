@@ -5,16 +5,19 @@ import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -43,6 +46,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private GoogleMap mMap;
+    private BottomSheetBehavior sheetBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,22 +88,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void initButtonListener() {
-        FloatingActionButton locationButton = findViewById(R.id.myLocationButton);
+        FloatingActionButton myLocationButton = findViewById(R.id.myLocationButton);
+        FloatingActionButton bottomSheetButton = findViewById(R.id.bottomSheetButton);
+        LinearLayout bottomSheet = findViewById(R.id.bottomSheet);
 
-//        profileButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                DrawerLayout mDrawerLayout = findViewById(R.id.drawer_layout);
-//                mDrawerLayout.openDrawer(GravityCompat.START);
-//            }
-//        });
+        sheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
-        locationButton.setOnClickListener(new View.OnClickListener() {
+        myLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 animateCameraToCurrentLocation();
             }
         });
+
+        bottomSheetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
+                else {
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
+
     }
     
     @SuppressLint("MissingPermission")
