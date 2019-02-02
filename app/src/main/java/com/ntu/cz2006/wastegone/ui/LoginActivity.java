@@ -30,32 +30,43 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     SignInButton signInButton;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
-        // Configure sign-in to request the user's ID, email address, and basic
+        GoogleSignInAccount lastSignIn = GoogleSignIn.getLastSignedInAccount(this);
+        if(lastSignIn == null)
+        {
+            // Initialize Firebase Auth
+            mAuth = FirebaseAuth.getInstance();
+            // Configure sign-in to request the user's ID, email address, and basic
 // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("741250666186-jqsl6h94kfqep1oa2m4ne61je2nhmucu.apps.googleusercontent.com")
-                .requestEmail()
-                .build();
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken("741250666186-jqsl6h94kfqep1oa2m4ne61je2nhmucu.apps.googleusercontent.com")
+                    .requestEmail()
+                    .build();
 
-        // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+            // Build a GoogleSignInClient with the options specified by gso.
+            mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        signInButton = (SignInButton)findViewById(R.id.sign_in_button);
+            signInButton = (SignInButton)findViewById(R.id.sign_in_button);
 
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-                startActivityForResult(signInIntent, 101);
-            }
-        });
+            signInButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                    startActivityForResult(signInIntent, 101);
+                }
+            });
+        }
+        else
+        {
+            Intent i = new Intent(getApplicationContext(),MapsActivity.class);
+            startActivity(i);
+        }
+
+
 
     }
 
@@ -87,7 +98,6 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-
                             FirebaseUser user = mAuth.getCurrentUser();
                             Intent i = new Intent(getApplicationContext(),ProfileActivity.class);
                             startActivity(i);
@@ -97,8 +107,6 @@ public class LoginActivity extends AppCompatActivity {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(getApplicationContext(),"Couldn't log in ", Toast.LENGTH_SHORT).show();
                         }
-
-                        // ...
                     }
                 });
     }

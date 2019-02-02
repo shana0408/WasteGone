@@ -93,7 +93,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
     }
-    
+
     private void animateCameraToCurrentLocation() {
         mFusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
             @Override
@@ -111,20 +111,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void showWasteOnMap() {
         db.collection("WasteLocation")
-            .get()
-            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        WasteLocation wasteLocation;
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            WasteLocation wasteLocation;
 
-                        wasteLocation = document.toObject(WasteLocation.class);
+                            wasteLocation = document.toObject(WasteLocation.class);
 
-                        LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+                            LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
 
-                        mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                            mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                        }
                     }
-                }
-            });
+                });
     }
 }
