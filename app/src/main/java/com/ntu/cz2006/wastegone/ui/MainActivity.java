@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openMap() {
-        Intent intent = new Intent(this, MapsActivity.class);
+        Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
 }
