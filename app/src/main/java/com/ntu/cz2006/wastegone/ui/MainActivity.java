@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void openMap() {
         Intent intent = new Intent(this, LogoActivity.class);
+        intent.putExtra("FROM_ACTIVITY", "MainActivity");
         startActivity(intent);
     }
 }

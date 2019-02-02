@@ -22,10 +22,12 @@ public class LogoActivity extends AppCompatActivity {
         if(lastSignIn == null)
         {
             Intent i = new Intent(getApplicationContext(),LoginActivity.class);
+            i.putExtra("FROM_ACTIVITY", "LogoActivity");
             startActivity(i);
         }
         else {
-            Intent i = new Intent(getApplicationContext(),MapsActivity.class);
+            Intent i = new Intent(this,MapsActivity.class);
+            i.putExtra("FROM_ACTIVITY", "LogoActivity");
             startActivity(i);
         }
     }
