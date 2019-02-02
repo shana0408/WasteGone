@@ -35,9 +35,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        GoogleSignInAccount lastSignIn = GoogleSignIn.getLastSignedInAccount(this);
-        if(lastSignIn == null)
-        {
             // Initialize Firebase Auth
             mAuth = FirebaseAuth.getInstance();
             // Configure sign-in to request the user's ID, email address, and basic
@@ -59,12 +56,7 @@ public class LoginActivity extends AppCompatActivity {
                     startActivityForResult(signInIntent, 101);
                 }
             });
-        }
-        else
-        {
-            Intent i = new Intent(getApplicationContext(),MapsActivity.class);
-            startActivity(i);
-        }
+
 
 
 
