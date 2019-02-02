@@ -9,7 +9,10 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,6 +28,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.ntu.cz2006.wastegone.R;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
+import com.squareup.picasso.Picasso;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private static final String TAG = "MapsActivity";
@@ -34,6 +38,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +53,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         initButtonListener();
+
+        //load profile picture
+        ImageView profilePic = (ImageView) findViewById(R.id.imageView);
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        Picasso.get().load(acct.getPhotoUrl()).into(profilePic);
+
     }
 
     @Override
