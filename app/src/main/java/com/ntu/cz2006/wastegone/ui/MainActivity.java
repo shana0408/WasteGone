@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import static com.ntu.cz2006.wastegone.Constants.ERROR_DIALOG_REQUEST;
 import static com.ntu.cz2006.wastegone.Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION;
@@ -25,23 +27,33 @@ import static com.ntu.cz2006.wastegone.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-
     private boolean mLocationPermissionGranted = false;
-
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         if (checkMapService()) {
             if (mLocationPermissionGranted) {
-                openMap();
-            } else {
+                if (user != null) {
+                    navigateMap();
+                }
+                else {
+                    navigateLogin();
+                }
+            }
+            else {
                 getLocationPermission();
             }
         }
     }
 
-    public boolean checkMapService() {
+    private boolean checkMapService() {
         if (isServiceOK()) {
             if (isMapEnable()) {
                 return true;
@@ -100,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
     private void getLocationPermission() {
         if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
-            openMap();
+            onResume();
         }
         else {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
@@ -131,9 +143,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void openMap() {
-        Intent intent = new Intent(this, LogoActivity.class);
-        intent.putExtra("FROM_ACTIVITY", "MainActivity");
+    private void navigateMap() {
+        Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
+        finish();
+    }
+
+    private void navigateLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

@@ -11,14 +11,10 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -32,11 +28,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -50,6 +41,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -73,6 +65,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     private GoogleMap mMap;
     private Location mLastLocation;
@@ -83,9 +76,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Button submitRequestButton;
     private Spinner categorySpinner;
     private EditText remarksInput;
-    GoogleSignInClient mGoogleSignInClient;
-    GoogleApiClient mGoogleApiClient;
-    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,26 +87,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        initUI();
+    }
+
+    private void initUI() {
         initButton();
         loadCategoryIntoSpinner();
 
-        //init sidebar
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //load profile picture
         View hView = navigationView.getHeaderView(0);
-        ImageView profilePic = (ImageView) hView.findViewById(R.id.imageView);
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-        Picasso.get().load(acct.getPhotoUrl()).into(profilePic);
-        //load name
-        TextView name = (TextView) hView.findViewById(R.id.name);
-        name.setText(acct.getDisplayName());
-        //load email
-        TextView email = (TextView) hView.findViewById(R.id.email);
-        email.setText(acct.getEmail());
 
+        TextView name = hView.findViewById(R.id.name);
+        name.setText(user.getDisplayName());
 
+        TextView email = hView.findViewById(R.id.email);
+        email.setText(user.getEmail());
+
+        ImageView profilePic = hView.findViewById(R.id.imageView);
+        Picasso.get().load(user.getPhotoUrl()).into(profilePic);
     }
 
     @Override
