@@ -106,6 +106,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         myLocationButton = findViewById(R.id.myLocationButton);
         toggleBottomSheetButton = findViewById(R.id.toggleBottomSheetButton);
         bottomSheet = findViewById(R.id.bottomSheet);
+        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         submitRequestButton = findViewById(R.id.submitRequestButton);
         categorySpinner = findViewById(R.id.categorySpinner);
         remarksInput = findViewById(R.id.remarksInput);
@@ -151,8 +152,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void initButtonListener() {
-        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-
         myLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
