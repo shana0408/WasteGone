@@ -53,7 +53,6 @@ import com.ntu.cz2006.wastegone.R;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,9 +62,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String TAG = "MapsActivity";
     private static final int DEFAULT_ZOOM = 17;
 
-    private FusedLocationProviderClient mFusedLocationProviderClient;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private FusedLocationProviderClient mFusedLocationProviderClient;
+    private FirebaseUser user;
 
     private GoogleMap mMap;
     private Location mLastLocation;
@@ -76,6 +75,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Button submitRequestButton;
     private Spinner categorySpinner;
     private EditText remarksInput;
+    private NavigationView navigationView;
+    private TextView userNameTextView;
+    private TextView userEmailTextView;
+    private ImageView userProfileImageView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +87,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
 
         mFusedLocationProviderClient = new FusedLocationProviderClient(this);
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -91,21 +96,32 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void initUI() {
-        initButton();
+        findViews();
+        initButtonListener();
         loadCategoryIntoSpinner();
+        loadUserIntoNavigation();
+    }
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+    private void findViews() {
+        myLocationButton = findViewById(R.id.myLocationButton);
+        toggleBottomSheetButton = findViewById(R.id.toggleBottomSheetButton);
+        bottomSheet = findViewById(R.id.bottomSheet);
+        submitRequestButton = findViewById(R.id.submitRequestButton);
+        categorySpinner = findViewById(R.id.categorySpinner);
+        remarksInput = findViewById(R.id.remarksInput);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
         View hView = navigationView.getHeaderView(0);
+        userNameTextView = hView.findViewById(R.id.userNameTextView);
+        userEmailTextView = hView.findViewById(R.id.userEmailTextView);
+        userProfileImageView = hView.findViewById(R.id.userProfileImageView);
+    }
 
-        TextView name = hView.findViewById(R.id.name);
-        name.setText(user.getDisplayName());
-
-        TextView email = hView.findViewById(R.id.email);
-        email.setText(user.getEmail());
-
-        ImageView profilePic = hView.findViewById(R.id.imageView);
-        Picasso.get().load(user.getPhotoUrl()).into(profilePic);
+    private void loadUserIntoNavigation() {
+        userNameTextView.setText(user.getDisplayName());
+        userEmailTextView.setText(user.getEmail());
+        Picasso.get().load(user.getPhotoUrl()).into(userProfileImageView);
     }
 
     @Override
@@ -134,14 +150,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         showWasteOnMap();
     }
 
-    private void initButton() {
-        myLocationButton = findViewById(R.id.myLocationButton);
-        toggleBottomSheetButton = findViewById(R.id.toggleBottomSheetButton);
-        bottomSheet = findViewById(R.id.bottomSheet);
-        submitRequestButton = findViewById(R.id.submitRequestButton);
-        categorySpinner = findViewById(R.id.categorySpinner);
-        remarksInput = findViewById(R.id.remarksInput);
-
+    private void initButtonListener() {
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
         myLocationButton.setOnClickListener(new View.OnClickListener() {
@@ -210,23 +219,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void loadCategoryIntoSpinner() {
-        db.collection("WasteCategory")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        ArrayList<String> categoryList = new ArrayList<String>();
-
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            String description = document.getString("description");
-                            categoryList.add(description);
-                        }
-
-                        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(MapsActivity.this, android.R.layout.simple_spinner_item, categoryList);
-                        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        categorySpinner.setAdapter(categoryAdapter);
-                    }
-                });
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.category_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(adapter);
     }
 
     @SuppressLint("MissingPermission")
