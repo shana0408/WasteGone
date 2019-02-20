@@ -229,24 +229,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         wasteLocationCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            return;
-                        }
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    return;
+                }
 
-                        for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
-                            switch (dc.getType()) {
-                                case ADDED:
-                                    WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
-                                    LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                                    mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()).icon(BitmapDescriptorFactory.fromResource(customMarker(wasteLocation.getCategory()))));
-                                case REMOVED:
-                                    return;
-                            }
-                        }
+                for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        case ADDED:
+                            WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
+                            LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+                            mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()).icon(BitmapDescriptorFactory.fromResource(customMarker(wasteLocation.getCategory()))));
+                        case REMOVED:
+                            return;
                     }
-                });
+                }
+            }
+        });
     }
 
     private void loadCategoryIntoSpinner() {
