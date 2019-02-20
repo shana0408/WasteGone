@@ -38,6 +38,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Continuation;
@@ -221,7 +222,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         WasteLocation wasteLocation = document.toObject(WasteLocation.class);
                         LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                        mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()).icon(BitmapDescriptorFactory.fromResource(customMarker(wasteLocation.getCategory()))));
                     }
                 }
             }
@@ -239,7 +240,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 case ADDED:
                                     WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
                                     LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                                    mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                                    mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()).icon(BitmapDescriptorFactory.fromResource(customMarker(wasteLocation.getCategory()))));
                                 case REMOVED:
                                     return;
                             }
@@ -335,6 +336,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         ContentResolver contentResolver = getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+
+    private int customMarker(String category)
+    {
+        if(category == "Paper")
+        {
+            return R.mipmap.paper_pin_foreground;
+        }
+        else if(category == "Aluminium")
+        {
+            return R.mipmap.aluminium_pin_foreground;
+        }
+        else if(category == "Plastic")
+        {
+            return R.mipmap.plastic_pin_pin_foreground;
+        }
+        else
+        {
+            return R.mipmap.aluminium_pin_foreground;
+        }
     }
 
     @Override
