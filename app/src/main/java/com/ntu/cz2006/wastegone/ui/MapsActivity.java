@@ -2,6 +2,7 @@ package com.ntu.cz2006.wastegone.ui;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
@@ -20,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,12 +40,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -52,7 +56,9 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.ntu.cz2006.wastegone.R;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
@@ -69,7 +75,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int DEFAULT_ZOOM = 17;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-//    private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
+    private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private FirebaseUser user;
 
@@ -84,6 +90,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private EditText remarksInput;
     private ImageButton uploadImageButton;
     private ImageView uploadImagePreview;
+    private TextView uploadImageTextView;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
     private TextView userNameTextView;
@@ -123,6 +130,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         remarksInput = findViewById(R.id.remarksInput);
         uploadImageButton = findViewById(R.id.uploadImageButton);
         uploadImagePreview = findViewById(R.id.uploadImagePreview);
+        uploadImageTextView = findViewById(R.id.uploadImageTextView);
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -204,7 +212,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void showWasteOnMap() {
-        db.collection("WasteLocation").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        final CollectionReference wasteLocationCollection = db.collection("WasteLocation");
+
+        wasteLocationCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
@@ -217,8 +227,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        db.collection("WasteLocation")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+        wasteLocationCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         if (e != null) {
@@ -282,29 +291,50 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void submitWasteRequest() {
-        Map<String, Object> wasteLocationDocument = new HashMap<String, Object>();
+        final StorageReference fileReference = mStorageRef.child("images/" + System.currentTimeMillis() + "." + getFileExtension(selectedImage));
+        UploadTask uploadTask = fileReference.putFile(selectedImage);
 
-        GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-//        String downloadableUri = uploadImage();
+        uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
 
-        wasteLocationDocument.put("geo_point", geoPoint);
-        wasteLocationDocument.put("category", categorySpinner.getSelectedItem().toString());
-        wasteLocationDocument.put("remarks", remarksInput.getText().toString());
+                return fileReference.getDownloadUrl();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Map<String, Object> wasteLocationDocument = new HashMap<String, Object>();
+                GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
-        db.collection("WasteLocation").document()
-                .set(wasteLocationDocument)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(MapsActivity.this, "WasteLocation added", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(MapsActivity.this, "Unable to add", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                wasteLocationDocument.put("geo_point", geoPoint);
+                wasteLocationDocument.put("category", categorySpinner.getSelectedItem().toString());
+                wasteLocationDocument.put("remarks", remarksInput.getText().toString());
+                wasteLocationDocument.put("images", uri.toString());
+
+                db.collection("WasteLocation").document().set(wasteLocationDocument)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(MapsActivity.this, "WasteLocation added", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(MapsActivity.this, "Unable to add", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        });
+    }
+
+    private String getFileExtension(Uri uri) {
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 
     @Override
@@ -379,6 +409,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     selectedImage = data.getData();
 
                     Picasso.get().load(selectedImage).into(uploadImagePreview);
+
                 }
             }
         }
