@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
@@ -22,6 +23,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -49,6 +51,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.ntu.cz2006.wastegone.R;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
@@ -58,11 +62,14 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import static com.ntu.cz2006.wastegone.Constants.REQUEST_CODE_IMAGE_OPEN;
+
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "MapsActivity";
     private static final int DEFAULT_ZOOM = 17;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+//    private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private FirebaseUser user;
 
@@ -75,11 +82,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Button submitRequestButton;
     private Spinner categorySpinner;
     private EditText remarksInput;
+    private ImageButton uploadImageButton;
+    private ImageView uploadImagePreview;
     private NavigationView navigationView;
+    private DrawerLayout drawerLayout;
     private TextView userNameTextView;
     private TextView userEmailTextView;
     private ImageView userProfileImageView;
 
+    private Uri selectedImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,8 +121,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         submitRequestButton = findViewById(R.id.submitRequestButton);
         categorySpinner = findViewById(R.id.categorySpinner);
         remarksInput = findViewById(R.id.remarksInput);
+        uploadImageButton = findViewById(R.id.uploadImageButton);
+        uploadImagePreview = findViewById(R.id.uploadImagePreview);
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        drawerLayout = findViewById(R.id.drawer_layout);
 
         View hView = navigationView.getHeaderView(0);
         userNameTextView = hView.findViewById(R.id.userNameTextView);
@@ -179,21 +193,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        uploadImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View c) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_CODE_IMAGE_OPEN);
+            }
+        });
     }
 
     private void showWasteOnMap() {
-        db.collection("WasteLocation")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            WasteLocation wasteLocation = document.toObject(WasteLocation.class);
-                            LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                            mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
-                        }
+        db.collection("WasteLocation").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        WasteLocation wasteLocation = document.toObject(WasteLocation.class);
+                        LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+                        mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
                     }
-                });
+                }
+            }
+        });
 
         db.collection("WasteLocation")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -240,7 +262,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -261,14 +282,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void submitWasteRequest() {
-        Map<String, Object> wasteLocation = new HashMap<String, Object>();
+        Map<String, Object> wasteLocationDocument = new HashMap<String, Object>();
+
         GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        wasteLocation.put("geo_point", geoPoint);
-        wasteLocation.put("category", categorySpinner.getSelectedItem().toString());
-        wasteLocation.put("remarks", remarksInput.getText().toString());
+//        String downloadableUri = uploadImage();
+
+        wasteLocationDocument.put("geo_point", geoPoint);
+        wasteLocationDocument.put("category", categorySpinner.getSelectedItem().toString());
+        wasteLocationDocument.put("remarks", remarksInput.getText().toString());
 
         db.collection("WasteLocation").document()
-                .set(wasteLocation)
+                .set(wasteLocationDocument)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -285,29 +309,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
+        else if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+        else {
             super.onBackPressed();
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.side_bar, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -315,32 +337,50 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
             Toast.makeText(getApplicationContext(), "Camera is clicked", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_gallery) {
+        }
+        else if (id == R.id.nav_gallery) {
 
-        } else if (id == R.id.nav_slideshow) {
+        }
+        else if (id == R.id.nav_slideshow) {
 
-        } else if (id == R.id.nav_manage) {
+        }
+        else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
+        }
+        else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_send) {
+        }
+        else if (id == R.id.nav_send) {
 
-        } else if (id == R.id.nav_logout) {
+        }
+        else if (id == R.id.nav_logout) {
             Intent i = new Intent(getApplicationContext(),LogoutActivity.class);
             i.putExtra("FROM_ACTIVITY", "MapsActivity");
             startActivity(i);
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @android.support.annotation.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQUEST_CODE_IMAGE_OPEN: {
+                if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                    selectedImage = data.getData();
+
+                    Picasso.get().load(selectedImage).into(uploadImagePreview);
+                }
+            }
+        }
     }
 }

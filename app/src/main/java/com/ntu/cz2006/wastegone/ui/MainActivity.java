@@ -24,10 +24,12 @@ import com.google.firebase.auth.FirebaseUser;
 import static com.ntu.cz2006.wastegone.Constants.ERROR_DIALOG_REQUEST;
 import static com.ntu.cz2006.wastegone.Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION;
 import static com.ntu.cz2006.wastegone.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
+import static com.ntu.cz2006.wastegone.Constants.PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private boolean mLocationPermissionGranted = false;
+    private boolean mStoragePermissionGranted = false;
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     @Override
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (checkMapService()) {
-            if (mLocationPermissionGranted) {
+            if (mLocationPermissionGranted && mStoragePermissionGranted) {
                 if (user != null) {
                     navigateMap();
                 }
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             else {
-                getLocationPermission();
+                getPermission();
             }
         }
     }
@@ -109,13 +111,23 @@ public class MainActivity extends AppCompatActivity {
         alert.show();
     }
 
-    private void getLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    private void getPermission() {
+        if (ActivityCompat.checkSelfPermission(this.getApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
-            onResume();
+            if (ActivityCompat.checkSelfPermission(this.getApplicationContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                mStoragePermissionGranted = true;
+                onResume();
+            }
+            else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+            }
         }
         else {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
 
@@ -127,6 +139,11 @@ public class MainActivity extends AppCompatActivity {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
+                }
+            }
+            case PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mStoragePermissionGranted = true;
                 }
             }
         }
