@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "741250666186-s9ddtk03fcp20brs9qomvlb4llt6e43l.apps.googleusercontent.com",
+          "client_id": "741250666186-g86ll3tqm8bnn6af1a62hcr73mj4an7i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.ntu.cz2006.wastegone",
-            "certificate_hash": "697d406936846c702115a739478b478f217a4d9a"
+            "certificate_hash": "5176b94e9e1c7c34ab95a0672e401abc99b0d16b"
           }
         },
         {
@@ -40,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "741250666186-jqsl6h94kfqep1oa2m4ne61je2nhmucu.apps.googleusercontent.com",
+              "client_id": "741250666186-j55rc1u6iv7b6v423q7jnfvfrg3lrf11.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
