@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.location.Location;
 import android.net.Uri;
@@ -272,6 +273,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
                     CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latlng, DEFAULT_ZOOM);
                     mMap.animateCamera(cameraUpdate);
+                    myLocationButton.setColorFilter(Color.argb(255,88,150,228));
                 }
             }
         });
@@ -293,7 +295,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         }
-
+        myLocationButton.setColorFilter(Color.argb(255,0,0,0));
         return super.dispatchTouchEvent(event);
     }
 
