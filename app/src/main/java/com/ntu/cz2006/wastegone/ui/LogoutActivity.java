@@ -10,6 +10,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.ntu.cz2006.wastegone.R;
 
 public class LogoutActivity extends AppCompatActivity {
@@ -33,6 +34,7 @@ public class LogoutActivity extends AppCompatActivity {
     }
 
     private void revokeAccess() {
+        FirebaseAuth.getInstance().signOut();
         mGoogleSignInClient.revokeAccess()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
