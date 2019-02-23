@@ -349,7 +349,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return R.mipmap.aluminium_pin_foreground;
         }
         else if(category == "Plastic")
-        {
+            {
             return R.mipmap.plastic_pin_pin_foreground;
         }
         else
