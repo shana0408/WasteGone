@@ -31,5 +31,5 @@
         app:layout_constraintBottom_toTopOf="@+id/textView4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/wastegone_logo" />
+        app:srcCompat="@mipmap/wastegone_icon_round" />
 </android.support.constraint.ConstraintLayout>
