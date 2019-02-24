@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.location.Location;
 import android.net.Uri;
@@ -50,6 +51,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -61,6 +64,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.ntu.cz2006.wastegone.R;
+import com.ntu.cz2006.wastegone.models.User;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
 
@@ -78,7 +82,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private FirebaseUser user;
+    private User user;
 
     private GoogleMap mMap;
     private Location mLastLocation;
@@ -96,6 +100,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private DrawerLayout drawerLayout;
     private TextView userNameTextView;
     private TextView userEmailTextView;
+    private TextView userRewardsTextView;
     private ImageView userProfileImageView;
 
     private Uri selectedImage;
@@ -106,7 +111,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
 
         mFusedLocationProviderClient = new FusedLocationProviderClient(this);
-        user = FirebaseAuth.getInstance().getCurrentUser();
+        user = getUser(FirebaseAuth.getInstance());
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -118,7 +123,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         findViews();
         initButtonListener();
         loadCategoryIntoSpinner();
-        loadUserIntoNavigation();
+//        loadUserIntoNavigation();
     }
 
     private void findViews() {
@@ -139,13 +144,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         View hView = navigationView.getHeaderView(0);
         userNameTextView = hView.findViewById(R.id.userNameTextView);
         userEmailTextView = hView.findViewById(R.id.userEmailTextView);
+        userRewardsTextView = hView.findViewById(R.id.userRewardsTextView);
         userProfileImageView = hView.findViewById(R.id.userProfileImageView);
     }
 
     private void loadUserIntoNavigation() {
-        userNameTextView.setText(user.getDisplayName());
+        userNameTextView.setText(user.getName());
         userEmailTextView.setText(user.getEmail());
-        Picasso.get().load(user.getPhotoUrl()).into(userProfileImageView);
+        userRewardsTextView.setText("Rewards: " + user.getRewards());
+        Picasso.get().load(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl()).into(userProfileImageView);
     }
 
     @Override
@@ -266,6 +273,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
                     CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latlng, DEFAULT_ZOOM);
                     mMap.animateCamera(cameraUpdate);
+                    myLocationButton.setColorFilter(Color.argb(255,88,150,228));
                 }
             }
         });
@@ -287,7 +295,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         }
-
+        myLocationButton.setColorFilter(Color.argb(255,0,0,0));
         return super.dispatchTouchEvent(event);
     }
 
@@ -349,13 +357,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return R.mipmap.aluminium_pin_foreground;
         }
         else if(category == "Plastic")
-        {
+            {
             return R.mipmap.plastic_pin_pin_foreground;
         }
         else
         {
             return R.mipmap.aluminium_pin_foreground;
         }
+    }
+
+    private User getUser(final FirebaseAuth mAuth)
+    {
+        DocumentReference docRef = db.collection("User").document(mAuth.getUid());
+        user = new User();
+        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                user = documentSnapshot.toObject(User.class);
+                Toast.makeText(getApplicationContext(), user.getName(), Toast.LENGTH_SHORT).show();
+                loadUserIntoNavigation();
+            }
+        });
+        return user;
     }
 
     @Override
