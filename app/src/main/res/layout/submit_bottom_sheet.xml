@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:text="Drop a request"
-        android:textColor="#444"
+        android:textColor="#000"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -36,7 +36,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="60dp"
         android:orientation="horizontal"
         android:weightSum="10">
 
@@ -44,7 +44,8 @@
             android:id="@+id/uploadImagePreview"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="4"/>
+            android:layout_weight="4"
+            android:src="@drawable/ic_addimage" />
         
         <TextView
             android:id="@+id/uploadImageTextView"
@@ -57,32 +58,14 @@
 
     </LinearLayout>
 
-
-    <RelativeLayout
+    <Button
+        android:id="@+id/submitRequestButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp">
-
-        <ImageButton
-            android:id="@+id/uploadImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:backgroundTint="@android:color/background_light"
-            android:src="@drawable/ic_addimage" />
-
-        <Button
-            android:id="@+id/submitRequestButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/uploadImageButton"
-            android:layout_marginStart="15dp"
-            android:text="SUBMIT REQUEST"
-            android:background="#000"
-            android:foreground="?attr/selectableItemBackground"
-            android:textColor="#fff"/>
-
-    </RelativeLayout>
-
+        android:layout_marginTop="30dp"
+        android:text="SUBMIT REQUEST"
+        android:background="#000"
+        android:foreground="?attr/selectableItemBackground"
+        android:textColor="#fff"/>
 
 </LinearLayout>
