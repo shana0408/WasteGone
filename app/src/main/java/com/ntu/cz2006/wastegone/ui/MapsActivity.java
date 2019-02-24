@@ -123,7 +123,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         findViews();
         initButtonListener();
         loadCategoryIntoSpinner();
-        loadUserIntoNavigation();
+//        loadUserIntoNavigation();
     }
 
     private void findViews() {
@@ -151,7 +151,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void loadUserIntoNavigation() {
         userNameTextView.setText(user.getName());
         userEmailTextView.setText(user.getEmail());
-        //userRewardsTextView.setText(user.getRewards());
+        userRewardsTextView.setText("Rewards: " + user.getRewards());
         Picasso.get().load(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl()).into(userProfileImageView);
     }
 
@@ -357,7 +357,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return R.mipmap.aluminium_pin_foreground;
         }
         else if(category == "Plastic")
-        {
+            {
             return R.mipmap.plastic_pin_pin_foreground;
         }
         else
@@ -375,6 +375,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 user = documentSnapshot.toObject(User.class);
                 Toast.makeText(getApplicationContext(), user.getName(), Toast.LENGTH_SHORT).show();
+                loadUserIntoNavigation();
             }
         });
         return user;
