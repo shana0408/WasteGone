@@ -37,8 +37,10 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -71,7 +73,8 @@ import javax.annotation.Nullable;
 
 import static com.ntu.cz2006.wastegone.Constants.REQUEST_CODE_IMAGE_OPEN;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
+public class MapsActivity extends AppCompatActivity implements
+        OnMapReadyCallback, OnMarkerClickListener, NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "MapsActivity";
     private static final int DEFAULT_ZOOM = 17;
 
@@ -82,10 +85,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private Location mLastLocation;
-    private BottomSheetBehavior mBottomSheetBehavior;
     private FloatingActionButton myLocationButton;
-    private FloatingActionButton toggleBottomSheetButton;
-    private LinearLayout bottomSheet;
+    private FloatingActionButton toggleSubmitBottomSheetButton;
+    private BottomSheetBehavior submitFormBottomSheetBehavior;
+    private BottomSheetBehavior wasteLocationDetailBottomSheetBehavior;
+    private LinearLayout submitFormBottomSheet;
+    private LinearLayout wasteLocationDetailBottomSheet;
     private Button submitRequestButton;
     private Spinner categorySpinner;
     private EditText remarksInput;
@@ -123,9 +128,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void findViews() {
         myLocationButton = findViewById(R.id.myLocationButton);
-        toggleBottomSheetButton = findViewById(R.id.toggleBottomSheetButton);
-        bottomSheet = findViewById(R.id.bottomSheet);
-        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        toggleSubmitBottomSheetButton = findViewById(R.id.toggleBottomSheetButton);
+        submitFormBottomSheet = findViewById(R.id.submitFormBottomSheet);
+        wasteLocationDetailBottomSheet = findViewById(R.id.wasteLocationDetailBottomSheet);
+        submitFormBottomSheetBehavior = BottomSheetBehavior.from(submitFormBottomSheet);
+        wasteLocationDetailBottomSheetBehavior = BottomSheetBehavior.from(wasteLocationDetailBottomSheet);
         submitRequestButton = findViewById(R.id.submitRequestButton);
         categorySpinner = findViewById(R.id.categorySpinner);
         remarksInput = findViewById(R.id.remarksInput);
@@ -169,6 +176,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.getUiSettings().setZoomControlsEnabled(false);
 
+        mMap.setOnMarkerClickListener(this);
+
         mFusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
             @Override
             public void onComplete(@NonNull Task<Location> task) {
@@ -192,13 +201,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        toggleBottomSheetButton.setOnClickListener(new View.OnClickListener() {
+        toggleSubmitBottomSheetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                if (submitFormBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                    submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 } else {
-                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
             }
         });
@@ -207,7 +216,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 submitWasteRequest();
-                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
 
@@ -231,10 +240,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         WasteLocation wasteLocation = document.toObject(WasteLocation.class);
                         LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latlng)
-                                .title(wasteLocation.getCategory())
-                                .snippet(wasteLocation.getRemarks())
-                                );
+                        mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
                     }
                 }
             }
@@ -252,10 +258,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         case ADDED:
                             WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
                             LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                            mMap.addMarker(new MarkerOptions().position(latlng)
-                                    .title(wasteLocation.getCategory())
-                                    .snippet(wasteLocation.getRemarks())
-                                    );
+                            mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
                         case REMOVED:
                             return;
                     }
@@ -291,16 +294,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            if (submitFormBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
 
                 Rect outRect = new Rect();
                 Rect buttonRect = new Rect();
-                bottomSheet.getGlobalVisibleRect(outRect);
-                toggleBottomSheetButton.getGlobalVisibleRect(buttonRect);
+                submitFormBottomSheet.getGlobalVisibleRect(outRect);
+                toggleSubmitBottomSheetButton.getGlobalVisibleRect(buttonRect);
 
                 if (!outRect.contains((int) event.getRawX(), (int) event.getRawY())
                         && !buttonRect.contains((int) event.getRawX(), (int) event.getRawY()))
-                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         }
         myLocationButton.setColorFilter(Color.argb(255,0,0,0));
@@ -375,8 +378,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }
-        else if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        else if (submitFormBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
         else {
             super.onBackPressed();
@@ -430,6 +433,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        if (wasteLocationDetailBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+            wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        } else {
+            wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+        return false;
     }
 
     @Override
