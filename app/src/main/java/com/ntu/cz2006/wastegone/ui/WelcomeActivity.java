@@ -30,7 +30,6 @@ public class WelcomeActivity extends AppCompatActivity {
                 }
             }
         };
-
         welcomeThread.start();
     }
 }
