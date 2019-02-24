@@ -3,8 +3,8 @@ package com.ntu.cz2006.wastegone.models;
 import com.google.firebase.firestore.GeoPoint;
 
 public class WasteLocation {
-    private User requestorUid;
-    private User collectorUid;
+    private String requestorUid;
+    private String collectorUid;
     private GeoPoint geo_point;
     private String category;
     private String remarks;
@@ -38,19 +38,19 @@ public class WasteLocation {
         this.category = category;
     }
 
-    public User getRequestorUid() {
+    public String getRequestorUid() {
         return requestorUid;
     }
 
-    public void setRequestorUid(User requestorUid) {
+    public void setRequestorUid(String requestorUid) {
         this.requestorUid = requestorUid;
     }
 
-    public User getCollectorUid() {
+    public String getCollectorUid() {
         return collectorUid;
     }
 
-    public void setCollectorUid(User collectorUid) {
+    public void setCollectorUid(String collectorUid) {
         this.collectorUid = collectorUid;
     }
 
