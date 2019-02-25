@@ -46,7 +46,7 @@
             android:layout_height="match_parent"
             android:layout_weight="4"
             android:src="@drawable/ic_addimage" />
-        
+
         <TextView
             android:id="@+id/uploadImageTextView"
             android:layout_width="0dp"
