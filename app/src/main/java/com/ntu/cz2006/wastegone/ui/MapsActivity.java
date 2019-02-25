@@ -26,7 +26,6 @@ import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -38,9 +37,10 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -51,7 +51,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -60,7 +59,6 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.ntu.cz2006.wastegone.R;
@@ -75,25 +73,27 @@ import javax.annotation.Nullable;
 
 import static com.ntu.cz2006.wastegone.Constants.REQUEST_CODE_IMAGE_OPEN;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
+public class MapsActivity extends AppCompatActivity implements
+        OnMapReadyCallback, OnMarkerClickListener, NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "MapsActivity";
     private static final int DEFAULT_ZOOM = 17;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private User user;
+    private FirebaseUser firebaseUser;
 
     private GoogleMap mMap;
     private Location mLastLocation;
-    private BottomSheetBehavior mBottomSheetBehavior;
     private FloatingActionButton myLocationButton;
-    private FloatingActionButton toggleBottomSheetButton;
-    private LinearLayout bottomSheet;
+    private FloatingActionButton toggleSubmitBottomSheetButton;
+    private BottomSheetBehavior submitFormBottomSheetBehavior;
+    private BottomSheetBehavior wasteLocationDetailBottomSheetBehavior;
+    private LinearLayout submitFormBottomSheet;
+    private LinearLayout wasteLocationDetailBottomSheet;
     private Button submitRequestButton;
     private Spinner categorySpinner;
     private EditText remarksInput;
-    private ImageButton uploadImageButton;
     private ImageView uploadImagePreview;
     private TextView uploadImageTextView;
     private NavigationView navigationView;
@@ -111,7 +111,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
 
         mFusedLocationProviderClient = new FusedLocationProviderClient(this);
-        user = getUser(FirebaseAuth.getInstance());
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -123,18 +123,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         findViews();
         initButtonListener();
         loadCategoryIntoSpinner();
-//        loadUserIntoNavigation();
+        loadUserIntoNavigation();
     }
 
     private void findViews() {
         myLocationButton = findViewById(R.id.myLocationButton);
-        toggleBottomSheetButton = findViewById(R.id.toggleBottomSheetButton);
-        bottomSheet = findViewById(R.id.bottomSheet);
-        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        toggleSubmitBottomSheetButton = findViewById(R.id.toggleBottomSheetButton);
+        submitFormBottomSheet = findViewById(R.id.submitFormBottomSheet);
+        wasteLocationDetailBottomSheet = findViewById(R.id.wasteLocationDetailBottomSheet);
+        submitFormBottomSheetBehavior = BottomSheetBehavior.from(submitFormBottomSheet);
+        wasteLocationDetailBottomSheetBehavior = BottomSheetBehavior.from(wasteLocationDetailBottomSheet);
         submitRequestButton = findViewById(R.id.submitRequestButton);
         categorySpinner = findViewById(R.id.categorySpinner);
         remarksInput = findViewById(R.id.remarksInput);
-        uploadImageButton = findViewById(R.id.uploadImageButton);
         uploadImagePreview = findViewById(R.id.uploadImagePreview);
         uploadImageTextView = findViewById(R.id.uploadImageTextView);
         navigationView = findViewById(R.id.nav_view);
@@ -149,10 +150,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void loadUserIntoNavigation() {
-        userNameTextView.setText(user.getName());
-        userEmailTextView.setText(user.getEmail());
-        userRewardsTextView.setText("Rewards: " + user.getRewards());
-        Picasso.get().load(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl()).into(userProfileImageView);
+        db.collection("User").document(firebaseUser.getUid())
+                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                User user = documentSnapshot.toObject(User.class);
+                userRewardsTextView.setText("Rewards: " + user.getRewards());
+            }
+        });
+        userNameTextView.setText(firebaseUser.getDisplayName());
+        userEmailTextView.setText(firebaseUser.getEmail());
+        Picasso.get().load(firebaseUser.getPhotoUrl()).into(userProfileImageView);
     }
 
     @Override
@@ -165,6 +173,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setRotateGesturesEnabled(false);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setZoomControlsEnabled(false);
+
+        mMap.setOnMarkerClickListener(this);
 
         mFusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
             @Override
@@ -189,13 +201,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        toggleBottomSheetButton.setOnClickListener(new View.OnClickListener() {
+        toggleSubmitBottomSheetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                if (submitFormBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                    submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 } else {
-                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
             }
         });
@@ -204,12 +216,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 submitWasteRequest();
-                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                remarksInput.setText("");
+                submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
 
-        uploadImageButton.setOnClickListener(new View.OnClickListener() {
+        uploadImagePreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View c) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -229,7 +240,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         WasteLocation wasteLocation = document.toObject(WasteLocation.class);
                         LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()).icon(BitmapDescriptorFactory.fromResource(customMarker(wasteLocation.getCategory()))));
+                        mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
                     }
                 }
             }
@@ -247,7 +258,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         case ADDED:
                             WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
                             LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                            mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()).icon(BitmapDescriptorFactory.fromResource(customMarker(wasteLocation.getCategory()))));
+                            mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
                         case REMOVED:
                             return;
                     }
@@ -283,16 +294,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            if (submitFormBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
 
                 Rect outRect = new Rect();
                 Rect buttonRect = new Rect();
-                bottomSheet.getGlobalVisibleRect(outRect);
-                toggleBottomSheetButton.getGlobalVisibleRect(buttonRect);
+                submitFormBottomSheet.getGlobalVisibleRect(outRect);
+                toggleSubmitBottomSheetButton.getGlobalVisibleRect(buttonRect);
 
                 if (!outRect.contains((int) event.getRawX(), (int) event.getRawY())
                         && !buttonRect.contains((int) event.getRawX(), (int) event.getRawY()))
-                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         }
         myLocationButton.setColorFilter(Color.argb(255,0,0,0));
@@ -348,37 +359,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private int customMarker(String category)
     {
-        if(category == "Paper")
-        {
+        if(category == "Paper") {
             return R.mipmap.paper_pin_foreground;
         }
-        else if(category == "Aluminium")
-        {
+        else if(category == "Aluminium") {
             return R.mipmap.aluminium_pin_foreground;
         }
-        else if(category == "Plastic")
-            {
+        else if(category == "Plastic") {
             return R.mipmap.plastic_pin_pin_foreground;
         }
-        else
-        {
+        else {
             return R.mipmap.aluminium_pin_foreground;
         }
-    }
-
-    private User getUser(final FirebaseAuth mAuth)
-    {
-        DocumentReference docRef = db.collection("User").document(mAuth.getUid());
-        user = new User();
-        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                user = documentSnapshot.toObject(User.class);
-                Toast.makeText(getApplicationContext(), user.getName(), Toast.LENGTH_SHORT).show();
-                loadUserIntoNavigation();
-            }
-        });
-        return user;
     }
 
     @Override
@@ -386,8 +378,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }
-        else if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        else if (submitFormBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
         else {
             super.onBackPressed();
@@ -436,6 +428,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
+    public boolean onMarkerClick(Marker marker) {
+        if (wasteLocationDetailBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+            wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        } else {
+            wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+        return false;
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @android.support.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -445,7 +447,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     selectedImage = data.getData();
 
                     Picasso.get().load(selectedImage).into(uploadImagePreview);
-
+                    uploadImageTextView.setText(selectedImage.toString());
                 }
             }
         }
