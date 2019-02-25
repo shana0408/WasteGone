@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.ReservationActivity">
 
+
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -18,4 +19,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <include layout="@layout/content_reservation" />
+
 </android.support.design.widget.CoordinatorLayout>
+
