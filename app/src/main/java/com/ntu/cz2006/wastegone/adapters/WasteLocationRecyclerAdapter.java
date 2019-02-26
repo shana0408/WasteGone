@@ -1,8 +1,5 @@
-package com.ntu.cz2006.wastegone.models;
+package com.ntu.cz2006.wastegone.adapters;
 
-import android.content.Context;
-import android.location.Address;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,14 +8,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ntu.cz2006.wastegone.R;
-import com.ntu.cz2006.wastegone.ui.MapsActivity;
+import com.ntu.cz2006.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
 import java.util.List;
 
-public class WasteAdapter extends RecyclerView.Adapter<WasteAdapter.MyViewHolder> {
+public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLocationRecyclerAdapter.MyViewHolder> {
 
     private List<WasteLocation> wasteLocationList;
-
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView status, category, remarks, geopoints;
@@ -34,8 +30,7 @@ public class WasteAdapter extends RecyclerView.Adapter<WasteAdapter.MyViewHolder
         }
     }
 
-
-    public WasteAdapter(List<WasteLocation> wasteLocationList) {
+    public WasteLocationRecyclerAdapter(List<WasteLocation> wasteLocationList) {
         this.wasteLocationList = wasteLocationList;
     }
 
