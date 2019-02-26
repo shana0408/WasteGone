@@ -131,10 +131,10 @@ public class MapsActivity extends AppCompatActivity implements
         toggleSubmitBottomSheetButton = findViewById(R.id.toggleBottomSheetButton);
         submitFormBottomSheet = findViewById(R.id.submitFormBottomSheet);
         wasteLocationDetailBottomSheet = findViewById(R.id.wasteLocationDetailBottomSheet);
-//        submitFormBottomSheetBehavior = BottomSheetBehavior.from(submitFormBottomSheet);
-        submitFormBottomSheetBehavior = BottomSheetBehavior.from(wasteLocationDetailBottomSheet);
-//        wasteLocationDetailBottomSheetBehavior = BottomSheetBehavior.from(wasteLocationDetailBottomSheet);
-        wasteLocationDetailBottomSheetBehavior = BottomSheetBehavior.from(submitFormBottomSheet);
+        submitFormBottomSheetBehavior = BottomSheetBehavior.from(submitFormBottomSheet);
+//        submitFormBottomSheetBehavior = BottomSheetBehavior.from(wasteLocationDetailBottomSheet);
+        wasteLocationDetailBottomSheetBehavior = BottomSheetBehavior.from(wasteLocationDetailBottomSheet);
+//        wasteLocationDetailBottomSheetBehavior = BottomSheetBehavior.from(submitFormBottomSheet);
         submitRequestButton = findViewById(R.id.submitRequestButton);
         categorySpinner = findViewById(R.id.categorySpinner);
         remarksInput = findViewById(R.id.remarksInput);
