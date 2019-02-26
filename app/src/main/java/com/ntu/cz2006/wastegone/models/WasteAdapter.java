@@ -1,5 +1,8 @@
 package com.ntu.cz2006.wastegone.models;
 
+import android.content.Context;
+import android.location.Address;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,17 +11,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ntu.cz2006.wastegone.R;
+import com.ntu.cz2006.wastegone.ui.MapsActivity;
 import com.squareup.picasso.Picasso;
-
 import java.util.List;
 
 public class WasteAdapter extends RecyclerView.Adapter<WasteAdapter.MyViewHolder> {
 
     private List<WasteLocation> wasteLocationList;
 
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView status, category, remarks, geopoints;
-        public ImageView imageView;
+        public ImageView wasteImage;
 
         public MyViewHolder(View view) {
             super(view);
@@ -26,7 +30,7 @@ public class WasteAdapter extends RecyclerView.Adapter<WasteAdapter.MyViewHolder
             category = (TextView) view.findViewById(R.id.category);
             remarks = (TextView) view.findViewById(R.id.remarks);
             geopoints = (TextView) view.findViewById(R.id.geopoints);
-            imageView = (ImageView) view.findViewById(R.id.reservation_image);
+            wasteImage = (ImageView) view.findViewById(R.id.waste_image);
         }
     }
 
@@ -47,10 +51,10 @@ public class WasteAdapter extends RecyclerView.Adapter<WasteAdapter.MyViewHolder
     public void onBindViewHolder(MyViewHolder holder, int position) {
         WasteLocation wasteLocation = wasteLocationList.get(position);
         holder.status.setText(wasteLocation.getStatus());
-        holder.category.setText(wasteLocation.getCategory());
-        holder.remarks.setText(wasteLocation.getRemarks());
-        holder.geopoints.setText(wasteLocation.getGeo_point().toString());
-//        Picasso.get().load(wasteLocation.getImageUri()).into(holder.imageView);
+        holder.category.setText("Category： "  + wasteLocation.getCategory());
+        holder.remarks.setText("Remarks: " + wasteLocation.getRemarks());
+        //holder.geopoints.setText(address);
+        Picasso.get().load(wasteLocation.getImageUri()).into(holder.wasteImage);
     }
 
     @Override
