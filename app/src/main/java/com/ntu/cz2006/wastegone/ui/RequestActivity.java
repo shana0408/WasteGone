@@ -2,15 +2,12 @@ package com.ntu.cz2006.wastegone.ui;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -19,7 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.ntu.cz2006.wastegone.R;
-import com.ntu.cz2006.wastegone.models.WasteAdapter;
+import com.ntu.cz2006.wastegone.adapters.WasteLocationRecyclerAdapter;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
 
 import java.util.ArrayList;
@@ -28,7 +25,7 @@ import java.util.List;
 public class RequestActivity extends AppCompatActivity {
     private List<WasteLocation> wasteLocationList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private WasteAdapter mAdapter;
+    private WasteLocationRecyclerAdapter mAdapter;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -41,7 +38,7 @@ public class RequestActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mAdapter = new WasteAdapter(wasteLocationList);
+        mAdapter = new WasteLocationRecyclerAdapter(wasteLocationList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

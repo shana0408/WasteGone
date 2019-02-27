@@ -49,9 +49,9 @@
                 app:backgroundTint="#FFFFFF" />
         </LinearLayout>
 
-
         <include layout="@layout/submit_bottom_sheet" />
         <include layout="@layout/marker_detail_bottom_sheet" />
+
     </android.support.design.widget.CoordinatorLayout>
 
 

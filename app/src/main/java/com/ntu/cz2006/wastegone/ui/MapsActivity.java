@@ -343,6 +343,7 @@ public class MapsActivity extends AppCompatActivity implements
                 Map<String, Object> wasteLocationDocument = new HashMap<String, Object>();
                 GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
+                wasteLocationDocument.put("requesterUid", firebaseUser.getUid());
                 wasteLocationDocument.put("geo_point", geoPoint);
                 wasteLocationDocument.put("category", categorySpinner.getSelectedItem().toString());
                 wasteLocationDocument.put("remarks", remarksInput.getText().toString());
