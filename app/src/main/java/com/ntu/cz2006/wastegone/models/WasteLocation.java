@@ -14,36 +14,22 @@ public class WasteLocation {
     public WasteLocation() {
     }
 
-    public GeoPoint getGeo_point() {
-        return geo_point;
-    }
-
-    public void setGeo_point(GeoPoint geo_point) {
+    public WasteLocation(String requesterUid, String collectorUid, GeoPoint geo_point, String category, String remarks, String imageUri, String status) {
+        this.requesterUid = requesterUid;
+        this.collectorUid = collectorUid;
         this.geo_point = geo_point;
-    }
-
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
         this.category = category;
+        this.remarks = remarks;
+        this.imageUri = imageUri;
+        this.status = status;
     }
 
-    public String getRequestoerUid() {
+    public String getRequesterUid() {
         return requesterUid;
     }
 
-    public void setRequesterUid(String requestorUid) {
-        this.requesterUid = requestorUid;
+    public void setRequesterUid(String requesterUid) {
+        this.requesterUid = requesterUid;
     }
 
     public String getCollectorUid() {
@@ -54,12 +40,28 @@ public class WasteLocation {
         this.collectorUid = collectorUid;
     }
 
-    public String getStatus() {
-        return status;
+    public GeoPoint getGeo_point() {
+        return geo_point;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setGeo_point(GeoPoint geo_point) {
+        this.geo_point = geo_point;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 
     public String getImageUri() {
@@ -68,5 +70,13 @@ public class WasteLocation {
 
     public void setImageUri(String imageUri) {
         this.imageUri = imageUri;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

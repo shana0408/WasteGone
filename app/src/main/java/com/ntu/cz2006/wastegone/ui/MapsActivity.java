@@ -18,10 +18,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -82,20 +85,31 @@ public class MapsActivity extends AppCompatActivity implements
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private FirebaseUser firebaseUser;
-
     private GoogleMap mMap;
     private Location mLastLocation;
+
     private FloatingActionButton myLocationButton;
     private FloatingActionButton toggleSubmitBottomSheetButton;
     private BottomSheetBehavior submitFormBottomSheetBehavior;
     private BottomSheetBehavior wasteLocationDetailBottomSheetBehavior;
     private LinearLayout submitFormBottomSheet;
     private LinearLayout wasteLocationDetailBottomSheet;
+
+    //Submit Form BottomSheet
     private Button submitRequestButton;
     private Spinner categorySpinner;
     private EditText remarksInput;
     private ImageView uploadImagePreview;
     private TextView uploadImageTextView;
+
+    //Waste Location Detail BottomSheet
+    private TextView titleTextView;
+    private TextView remarksTextView;
+    private TextView statusTextView;
+    private TextView requesterNameTextView;
+    private ImageView wasteImageView;
+
+    //Navigation Drawer
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
     private TextView userNameTextView;
@@ -133,11 +147,19 @@ public class MapsActivity extends AppCompatActivity implements
         wasteLocationDetailBottomSheet = findViewById(R.id.wasteLocationDetailBottomSheet);
         submitFormBottomSheetBehavior = BottomSheetBehavior.from(submitFormBottomSheet);
         wasteLocationDetailBottomSheetBehavior = BottomSheetBehavior.from(wasteLocationDetailBottomSheet);
-        submitRequestButton = findViewById(R.id.submitRequestButton);
-        categorySpinner = findViewById(R.id.categorySpinner);
-        remarksInput = findViewById(R.id.remarksInput);
-        uploadImagePreview = findViewById(R.id.uploadImagePreview);
-        uploadImageTextView = findViewById(R.id.uploadImageTextView);
+
+        submitRequestButton = submitFormBottomSheet.findViewById(R.id.submitRequestButton);
+        categorySpinner = submitFormBottomSheet.findViewById(R.id.categorySpinner);
+        remarksInput = submitFormBottomSheet.findViewById(R.id.remarksInput);
+        uploadImagePreview = submitFormBottomSheet.findViewById(R.id.uploadImagePreview);
+        uploadImageTextView = submitFormBottomSheet.findViewById(R.id.uploadImageTextView);
+
+        titleTextView = wasteLocationDetailBottomSheet.findViewById(R.id.titleTextView);
+        remarksTextView = wasteLocationDetailBottomSheet.findViewById(R.id.remarksTextView);
+        statusTextView = wasteLocationDetailBottomSheet.findViewById(R.id.statusTextView);
+        requesterNameTextView = wasteLocationDetailBottomSheet.findViewById(R.id.requesterNameTextView);
+        wasteImageView = wasteLocationDetailBottomSheet.findViewById(R.id.wasteImageView);
+
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -239,8 +261,10 @@ public class MapsActivity extends AppCompatActivity implements
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         WasteLocation wasteLocation = document.toObject(WasteLocation.class);
+                        Log.d(TAG, "showWasteOnMap: " + wasteLocation.getRequesterUid());
                         LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                        Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                        marker.setTag(wasteLocation);
                     }
                 }
             }
@@ -258,7 +282,8 @@ public class MapsActivity extends AppCompatActivity implements
                         case ADDED:
                             WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
                             LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                            mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                            Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                            marker.setTag(wasteLocation);
                         case REMOVED:
                             return;
                     }
@@ -268,9 +293,20 @@ public class MapsActivity extends AppCompatActivity implements
     }
 
     private void loadCategoryIntoSpinner() {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.category_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        String[] categories = new String[]{"Aluminium", "E-Waste", "Plastic", "Paper"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories) {
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v = super.getView(position, convertView, parent);
+                ((TextView) v).setTextSize(16);
+                return v;
+            }
+
+            public View getDropDownView(int position, View convertView,ViewGroup parent) {
+                View v = super.getDropDownView(position, convertView,parent);
+                ((TextView) v).setGravity(Gravity.CENTER);
+                return v;
+            }
+        };
         categorySpinner.setAdapter(adapter);
     }
 
@@ -295,7 +331,6 @@ public class MapsActivity extends AppCompatActivity implements
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             if (submitFormBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-
                 Rect outRect = new Rect();
                 Rect buttonRect = new Rect();
                 submitFormBottomSheet.getGlobalVisibleRect(outRect);
@@ -304,6 +339,14 @@ public class MapsActivity extends AppCompatActivity implements
                 if (!outRect.contains((int) event.getRawX(), (int) event.getRawY())
                         && !buttonRect.contains((int) event.getRawX(), (int) event.getRawY()))
                     submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+            else if (wasteLocationDetailBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                Rect outRect = new Rect();
+                wasteLocationDetailBottomSheet.getGlobalVisibleRect(outRect);
+
+                if (!outRect.contains((int) event.getRawX(), (int) event.getRawY())) {
+                    wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
             }
         }
         myLocationButton.setColorFilter(Color.argb(255,0,0,0));
@@ -326,17 +369,13 @@ public class MapsActivity extends AppCompatActivity implements
         }).addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                Map<String, Object> wasteLocationDocument = new HashMap<String, Object>();
                 GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
-                wasteLocationDocument.put("requesterUid", firebaseUser.getUid());
-                wasteLocationDocument.put("geo_point", geoPoint);
-                wasteLocationDocument.put("category", categorySpinner.getSelectedItem().toString());
-                wasteLocationDocument.put("remarks", remarksInput.getText().toString());
-                wasteLocationDocument.put("imageUri", uri.toString());
-                wasteLocationDocument.put("status", "active");
+                WasteLocation wasteLocation = new WasteLocation(firebaseUser.getUid(), null, geoPoint,
+                        categorySpinner.getSelectedItem().toString(), remarksInput.getText().toString(),
+                        uri.toString(), "active");
 
-                db.collection("WasteLocation").document().set(wasteLocationDocument)
+                db.collection("WasteLocation").document().set(wasteLocation)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -431,9 +470,26 @@ public class MapsActivity extends AppCompatActivity implements
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        if (wasteLocationDetailBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+        if (wasteLocationDetailBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+            WasteLocation wasteLocation = (WasteLocation) marker.getTag();
+
+            titleTextView.setText(wasteLocation.getCategory());
+            remarksTextView.setText("Remarks: " + wasteLocation.getRemarks());
+            statusTextView.setText("Status: " + wasteLocation.getStatus());
+
+            db.collection("User").document(wasteLocation.getRequesterUid()).get()
+                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            User user = documentSnapshot.toObject(User.class);
+                            requesterNameTextView.setText("Drop by: " + user.getName());
+                        }
+                    });
+            Picasso.get().load(wasteLocation.getImageUri()).into(wasteImageView);
+
             wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        } else {
+        }
+        else {
             wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
         return false;
