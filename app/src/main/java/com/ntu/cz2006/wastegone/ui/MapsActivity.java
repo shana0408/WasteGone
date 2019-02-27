@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -102,6 +103,12 @@ public class MapsActivity extends AppCompatActivity implements
     private TextView userEmailTextView;
     private TextView userRewardsTextView;
     private ImageView userProfileImageView;
+    private ImageView wasteImage;
+    private TextView wasteCategory;
+    private TextView wasteRemarks;
+    private TextView wasteStatus;
+    private TextView wasteRequester;
+    private Button wasteBottomSheetButton;
 
     private Uri selectedImage;
 
@@ -132,9 +139,7 @@ public class MapsActivity extends AppCompatActivity implements
         submitFormBottomSheet = findViewById(R.id.submitFormBottomSheet);
         wasteLocationDetailBottomSheet = findViewById(R.id.wasteLocationDetailBottomSheet);
         submitFormBottomSheetBehavior = BottomSheetBehavior.from(submitFormBottomSheet);
-//        submitFormBottomSheetBehavior = BottomSheetBehavior.from(wasteLocationDetailBottomSheet);
         wasteLocationDetailBottomSheetBehavior = BottomSheetBehavior.from(wasteLocationDetailBottomSheet);
-//        wasteLocationDetailBottomSheetBehavior = BottomSheetBehavior.from(submitFormBottomSheet);
         submitRequestButton = findViewById(R.id.submitRequestButton);
         categorySpinner = findViewById(R.id.categorySpinner);
         remarksInput = findViewById(R.id.remarksInput);
@@ -149,6 +154,13 @@ public class MapsActivity extends AppCompatActivity implements
         userEmailTextView = hView.findViewById(R.id.userEmailTextView);
         userRewardsTextView = hView.findViewById(R.id.userRewardsTextView);
         userProfileImageView = hView.findViewById(R.id.userProfileImageView);
+
+        wasteImage = findViewById(R.id.wasteImage);
+        wasteCategory = findViewById(R.id.wasteCategory);
+        wasteRemarks = findViewById(R.id.wasteRemarks);
+        wasteStatus = findViewById(R.id.wasteStatus);
+        wasteRequester = findViewById(R.id.wasteRequester);
+        wasteBottomSheetButton = findViewById(R.id.wasteBottomSheetButton);
     }
 
     private void loadUserIntoNavigation() {
@@ -334,7 +346,10 @@ public class MapsActivity extends AppCompatActivity implements
                 wasteLocationDocument.put("geo_point", geoPoint);
                 wasteLocationDocument.put("category", categorySpinner.getSelectedItem().toString());
                 wasteLocationDocument.put("remarks", remarksInput.getText().toString());
-                wasteLocationDocument.put("images", uri.toString());
+                wasteLocationDocument.put("imageUri", uri.toString());
+                wasteLocationDocument.put("collectorUid", null);
+                wasteLocationDocument.put("requesterUid", firebaseUser.getUid());
+                wasteLocationDocument.put("status", "active");
 
                 db.collection("WasteLocation").document().set(wasteLocationDocument)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -431,6 +446,32 @@ public class MapsActivity extends AppCompatActivity implements
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        final CollectionReference wasteLocationCollection = db.collection("WasteLocation");
+        final LatLng position = marker.getPosition();
+        final String TAG = "debug";
+
+        wasteLocationCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        WasteLocation wasteLocation = document.toObject(WasteLocation.class);
+                        LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+                        if (latlng.latitude == position.latitude) {
+                            if (latlng.longitude == position.longitude){
+                                Log.v(TAG, wasteLocation.getImageUri());
+                                wasteCategory.setText("Category: " + wasteLocation.getCategory());
+                                wasteRemarks.setText("Remarks: " + wasteLocation.getRemarks());
+                                wasteStatus.setText("Status: " + wasteLocation.getStatus());
+                                wasteRequester.setText("Requester: " + wasteLocation.getRequesterUid());
+                                Picasso.get().load(wasteLocation.getImageUri()).into(wasteImage);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
         if (wasteLocationDetailBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
             wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         } else {

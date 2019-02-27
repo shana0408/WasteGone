@@ -38,12 +38,12 @@ public class WasteLocation {
         this.category = category;
     }
 
-    public String getRequestoerUid() {
+    public String getRequesterUid() {
         return requesterUid;
     }
 
-    public void setRequesterUid(String requestorUid) {
-        this.requesterUid = requestorUid;
+    public void setRequesterUid(String requesterUid) {
+        this.requesterUid = requesterUid;
     }
 
     public String getCollectorUid() {
