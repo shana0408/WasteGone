@@ -16,7 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.ntu.cz2006.wastegone.R;
-import com.ntu.cz2006.wastegone.models.WasteAdapter;
+import com.ntu.cz2006.wastegone.adapters.WasteLocationRecyclerAdapter;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.List;
 public class ReservationActivity extends AppCompatActivity {
     private List<WasteLocation> wasteLocationList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private WasteAdapter mAdapter;
+    private WasteLocationRecyclerAdapter mAdapter;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -38,7 +38,7 @@ public class ReservationActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mAdapter = new WasteAdapter(wasteLocationList);
+        mAdapter = new WasteLocationRecyclerAdapter(wasteLocationList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
