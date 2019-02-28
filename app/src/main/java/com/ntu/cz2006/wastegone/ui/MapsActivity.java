@@ -105,6 +105,7 @@ public class MapsActivity extends AppCompatActivity implements
     private TextView statusTextView;
     private TextView requesterNameTextView;
     private ImageView wasteImageView;
+    private Button reserveButton;
 
     //Navigation Drawer
     private NavigationView navigationView;
@@ -156,6 +157,7 @@ public class MapsActivity extends AppCompatActivity implements
         statusTextView = wasteLocationDetailBottomSheet.findViewById(R.id.statusTextView);
         requesterNameTextView = wasteLocationDetailBottomSheet.findViewById(R.id.requesterNameTextView);
         wasteImageView = wasteLocationDetailBottomSheet.findViewById(R.id.wasteImageView);
+        reserveButton = wasteLocationDetailBottomSheet.findViewById(R.id.reserveButton);
 
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -255,36 +257,36 @@ public class MapsActivity extends AppCompatActivity implements
         wasteLocationCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        WasteLocation wasteLocation = document.toObject(WasteLocation.class);
-                        Log.d(TAG, "showWasteOnMap: " + wasteLocation.getRequesterUid());
-                        LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                        Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
-                        marker.setTag(wasteLocation);
-                    }
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    WasteLocation wasteLocation = document.toObject(WasteLocation.class);
+                    Log.d(TAG, "showWasteOnMap: " + wasteLocation.getRequesterUid());
+                    LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+                    Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                    marker.setTag(wasteLocation);
                 }
+            }
             }
         });
 
         wasteLocationCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    return;
-                }
+            if (e != null) {
+                return;
+            }
 
-                for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
-                    switch (dc.getType()) {
-                        case ADDED:
-                            WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
-                            LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                            Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
-                            marker.setTag(wasteLocation);
-                        case REMOVED:
-                            return;
-                    }
+            for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
+                switch (dc.getType()) {
+                    case ADDED:
+                        WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
+                        LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+                        Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                        marker.setTag(wasteLocation);
+                    case REMOVED:
+                        return;
                 }
+            }
             }
         });
     }
@@ -312,13 +314,13 @@ public class MapsActivity extends AppCompatActivity implements
         mFusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
             @Override
             public void onComplete(@NonNull Task<Location> task) {
-                if (task.isSuccessful()) {
-                    Location location = task.getResult();
-                    LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
-                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latlng, DEFAULT_ZOOM);
-                    mMap.animateCamera(cameraUpdate);
-                    myLocationButton.setColorFilter(Color.argb(255,88,150,228));
-                }
+            if (task.isSuccessful()) {
+                Location location = task.getResult();
+                LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latlng, DEFAULT_ZOOM);
+                mMap.animateCamera(cameraUpdate);
+                myLocationButton.setColorFilter(Color.argb(255,88,150,228));
+            }
             }
         });
 
@@ -357,34 +359,34 @@ public class MapsActivity extends AppCompatActivity implements
         uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
             @Override
             public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                if (!task.isSuccessful()) {
-                    throw task.getException();
-                }
+            if (!task.isSuccessful()) {
+                throw task.getException();
+            }
 
-                return fileReference.getDownloadUrl();
+            return fileReference.getDownloadUrl();
             }
         }).addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
-                WasteLocation wasteLocation = new WasteLocation(firebaseUser.getUid(), null, geoPoint,
-                        categorySpinner.getSelectedItem().toString(), remarksInput.getText().toString(),
-                        uri.toString(), "active");
+            WasteLocation wasteLocation = new WasteLocation(firebaseUser.getUid(), null, geoPoint,
+                categorySpinner.getSelectedItem().toString(), remarksInput.getText().toString(),
+                uri.toString(), "active");
 
-                db.collection("WasteLocation").document().set(wasteLocation)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(MapsActivity.this, "WasteLocation added", Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(MapsActivity.this, "Unable to add", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+            db.collection("WasteLocation").document().set(wasteLocation)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(MapsActivity.this, "WasteLocation added", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(MapsActivity.this, "Unable to add", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
@@ -468,7 +470,7 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     public boolean onMarkerClick(Marker marker) {
         if (wasteLocationDetailBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-            WasteLocation wasteLocation = (WasteLocation) marker.getTag();
+            final WasteLocation wasteLocation = (WasteLocation) marker.getTag();
 
             titleTextView.setText(wasteLocation.getCategory());
             remarksTextView.setText("Remarks: " + wasteLocation.getRemarks());
