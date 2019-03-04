@@ -421,6 +421,9 @@ public class MapsActivity extends AppCompatActivity implements
         else if (submitFormBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
             submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
+        else if (wasteLocationDetailBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
         else {
             super.onBackPressed();
         }
