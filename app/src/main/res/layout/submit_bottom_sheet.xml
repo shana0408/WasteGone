@@ -71,8 +71,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="SUBMIT REQUEST"
-        android:background="#000"
         android:foreground="?attr/selectableItemBackground"
+        android:background="#000"
         android:textColor="#fff"/>
 
 </LinearLayout>

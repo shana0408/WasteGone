@@ -71,7 +71,7 @@ import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nullable;
 
-import static com.ntu.cz2006.wastegone.Constants.REQUEST_CODE_IMAGE_OPEN;
+import static com.ntu.cz2006.wastegone.Constants.*;
 
 public class MapsActivity extends AppCompatActivity implements
         OnMapReadyCallback, OnMarkerClickListener, NavigationView.OnNavigationItemSelectedListener {
@@ -237,7 +237,6 @@ public class MapsActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 submitWasteRequest();
-                submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
 
@@ -372,13 +371,14 @@ public class MapsActivity extends AppCompatActivity implements
 
             WasteLocation wasteLocation = new WasteLocation(firebaseUser.getUid(), null, geoPoint,
                 categorySpinner.getSelectedItem().toString(), remarksInput.getText().toString(),
-                uri.toString(), "active");
+                uri.toString(), WASTE_LOCATION_STATUS_OPEN);
 
             db.collection("WasteLocation").document().set(wasteLocation)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(MapsActivity.this, "WasteLocation added", Toast.LENGTH_SHORT).show();
+                        submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -478,6 +478,17 @@ public class MapsActivity extends AppCompatActivity implements
             titleTextView.setText(wasteLocation.getCategory());
             remarksTextView.setText("Remarks: " + wasteLocation.getRemarks());
             statusTextView.setText("Status: " + wasteLocation.getStatus());
+
+            if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_OPEN)) {
+                reserveButton.setText("Reserve");
+            }
+            else if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_RESERVED) && firebaseUser.getUid().equals(wasteLocation.getCollectorUid())) {
+                reserveButton.setText("Collect");
+            }
+            else {
+                reserveButton.setText("Collected, Closed");
+                reserveButton.setEnabled(false);
+            }
 
             db.collection("User").document(wasteLocation.getRequesterUid()).get()
                     .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
