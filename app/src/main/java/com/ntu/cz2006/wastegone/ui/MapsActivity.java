@@ -105,7 +105,7 @@ public class MapsActivity extends AppCompatActivity implements
     private TextView statusTextView;
     private TextView requesterNameTextView;
     private ImageView wasteImageView;
-    private Button reserveButton;
+    private Button reserveCollectButton;
 
     //Navigation Drawer
     private NavigationView navigationView;
@@ -157,7 +157,7 @@ public class MapsActivity extends AppCompatActivity implements
         statusTextView = wasteLocationDetailBottomSheet.findViewById(R.id.statusTextView);
         requesterNameTextView = wasteLocationDetailBottomSheet.findViewById(R.id.requesterNameTextView);
         wasteImageView = wasteLocationDetailBottomSheet.findViewById(R.id.wasteImageView);
-        reserveButton = wasteLocationDetailBottomSheet.findViewById(R.id.reserveButton);
+        reserveCollectButton = wasteLocationDetailBottomSheet.findViewById(R.id.reserveCollectButton);
 
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -248,6 +248,13 @@ public class MapsActivity extends AppCompatActivity implements
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_CODE_IMAGE_OPEN);
             }
         });
+
+        reserveCollectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reserveCollectRequest(v);
+            }
+        });
     }
 
     private void showWasteOnMap() {
@@ -259,6 +266,7 @@ public class MapsActivity extends AppCompatActivity implements
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     WasteLocation wasteLocation = document.toObject(WasteLocation.class);
+                    wasteLocation.setId(document.getId());
                     Log.d(TAG, "showWasteOnMap: " + wasteLocation.getRequesterUid());
                     LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
                     Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
@@ -279,6 +287,7 @@ public class MapsActivity extends AppCompatActivity implements
                 switch (dc.getType()) {
                     case ADDED:
                         WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
+                        wasteLocation.setId(dc.getDocument().getId());
                         LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
                         Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
                         marker.setTag(wasteLocation);
@@ -480,14 +489,17 @@ public class MapsActivity extends AppCompatActivity implements
             statusTextView.setText("Status: " + wasteLocation.getStatus());
 
             if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_OPEN)) {
-                reserveButton.setText("Reserve");
+                reserveCollectButton.setText("Reserve");
+                reserveCollectButton.setTag(wasteLocation);
             }
             else if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_RESERVED) && firebaseUser.getUid().equals(wasteLocation.getCollectorUid())) {
-                reserveButton.setText("Collect");
+                reserveCollectButton.setText("Collect");
+                reserveCollectButton.setTag(wasteLocation);
             }
             else {
-                reserveButton.setText("Collected, Closed");
-                reserveButton.setEnabled(false);
+                reserveCollectButton.setText("Collected, Closed");
+                reserveCollectButton.setEnabled(false);
+                reserveCollectButton.setBackgroundColor(Color.parseColor("gray"));
             }
 
             db.collection("User").document(wasteLocation.getRequesterUid()).get()
@@ -522,5 +534,27 @@ public class MapsActivity extends AppCompatActivity implements
                 }
             }
         }
+    }
+
+    private void reserveCollectRequest(View v) {
+        Button button = (Button) v;
+        WasteLocation wasteLocation = (WasteLocation) button.getTag();
+
+        if (button.getText().equals("Reserve")) {
+            wasteLocation.setCollectorUid(firebaseUser.getUid());
+            wasteLocation.setStatus(WASTE_LOCATION_STATUS_RESERVED);
+        }
+        else if (button.getText().equals("Collect")) {
+            wasteLocation.setCollectorUid(firebaseUser.getUid());
+            wasteLocation.setStatus(WASTE_LOCATION_STATUS_COLLECTED);
+        }
+
+        db.collection("WasteLocation").document(wasteLocation.getId()).set(wasteLocation)
+        .addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
     }
 }

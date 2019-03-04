@@ -1,8 +1,12 @@
 package com.ntu.cz2006.wastegone.models;
 
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.GeoPoint;
 
 public class WasteLocation {
+    @Exclude
+    private String id;
+
     private String requesterUid;
     private String collectorUid;
     private GeoPoint geo_point;
@@ -22,6 +26,14 @@ public class WasteLocation {
         this.remarks = remarks;
         this.imageUri = imageUri;
         this.status = status;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getRequesterUid() {
