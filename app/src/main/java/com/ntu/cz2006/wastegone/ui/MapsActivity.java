@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -97,7 +98,8 @@ public class MapsActivity extends AppCompatActivity implements
     private Spinner categorySpinner;
     private EditText remarksInput;
     private ImageView uploadImagePreview;
-    private TextView uploadImageTextView;
+    private ImageView showImage;
+    private ProgressBar submitProgressBar;
 
     //Waste Location Detail BottomSheet
     private TextView titleTextView;
@@ -106,6 +108,7 @@ public class MapsActivity extends AppCompatActivity implements
     private TextView requesterNameTextView;
     private ImageView wasteImageView;
     private Button reserveCollectButton;
+    private ProgressBar reserveProgressBar;
 
     //Navigation Drawer
     private NavigationView navigationView;
@@ -150,7 +153,8 @@ public class MapsActivity extends AppCompatActivity implements
         categorySpinner = submitFormBottomSheet.findViewById(R.id.categorySpinner);
         remarksInput = submitFormBottomSheet.findViewById(R.id.remarksInput);
         uploadImagePreview = submitFormBottomSheet.findViewById(R.id.uploadImagePreview);
-        uploadImageTextView = submitFormBottomSheet.findViewById(R.id.uploadImageTextView);
+        showImage = submitFormBottomSheet.findViewById(R.id.showImage);
+        submitProgressBar = submitFormBottomSheet.findViewById(R.id.submitRequestProgressBar);
 
         titleTextView = wasteLocationDetailBottomSheet.findViewById(R.id.titleTextView);
         remarksTextView = wasteLocationDetailBottomSheet.findViewById(R.id.remarksTextView);
@@ -158,6 +162,7 @@ public class MapsActivity extends AppCompatActivity implements
         requesterNameTextView = wasteLocationDetailBottomSheet.findViewById(R.id.requesterNameTextView);
         wasteImageView = wasteLocationDetailBottomSheet.findViewById(R.id.wasteImageView);
         reserveCollectButton = wasteLocationDetailBottomSheet.findViewById(R.id.reserveCollectButton);
+        reserveProgressBar = wasteLocationDetailBottomSheet.findViewById(R.id.reserveRequestProgressBar);
 
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -236,6 +241,8 @@ public class MapsActivity extends AppCompatActivity implements
         submitRequestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                submitProgressBar.bringToFront();
+                submitProgressBar.setVisibility(View.VISIBLE);
                 submitWasteRequest();
             }
         });
@@ -252,6 +259,8 @@ public class MapsActivity extends AppCompatActivity implements
         reserveCollectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                reserveProgressBar.bringToFront();
+                reserveProgressBar.setVisibility(View.VISIBLE);
                 reserveCollectRequest(v);
             }
         });
@@ -387,12 +396,14 @@ public class MapsActivity extends AppCompatActivity implements
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(MapsActivity.this, "WasteLocation added", Toast.LENGTH_SHORT).show();
+                        submitProgressBar.setVisibility(View.INVISIBLE);
                         submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        submitProgressBar.setVisibility(View.INVISIBLE);
                         Toast.makeText(MapsActivity.this, "Unable to add", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -528,9 +539,8 @@ public class MapsActivity extends AppCompatActivity implements
             case REQUEST_CODE_IMAGE_OPEN: {
                 if (resultCode == RESULT_OK && data != null && data.getData() != null) {
                     selectedImage = data.getData();
-
-                    Picasso.get().load(selectedImage).into(uploadImagePreview);
-                    uploadImageTextView.setText(selectedImage.toString());
+                    Toast.makeText(MapsActivity.this, selectedImage.toString(), Toast.LENGTH_SHORT).show();
+                    Picasso.get().load(selectedImage).into(showImage);
                 }
             }
         }
@@ -553,6 +563,8 @@ public class MapsActivity extends AppCompatActivity implements
         .addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                Toast.makeText(MapsActivity.this, "Reserved", Toast.LENGTH_SHORT).show();
+                reserveProgressBar.setVisibility(View.INVISIBLE);
                 wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
