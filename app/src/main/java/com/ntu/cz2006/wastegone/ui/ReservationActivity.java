@@ -11,8 +11,11 @@ import android.view.MenuItem;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.ntu.cz2006.wastegone.R;
@@ -27,6 +30,7 @@ public class ReservationActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private WasteLocationRecyclerAdapter mAdapter;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +41,7 @@ public class ReservationActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mAdapter = new WasteLocationRecyclerAdapter(wasteLocationList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -48,7 +53,7 @@ public class ReservationActivity extends AppCompatActivity {
     }
 
     private void prepareWaste() {
-        final CollectionReference wasteLocationCollection = db.collection("WasteLocation");
+        final Query wasteLocationCollection = db.collection("WasteLocation").whereEqualTo("collectorUid" , firebaseUser.getUid());
 
         wasteLocationCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override

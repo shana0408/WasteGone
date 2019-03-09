@@ -8,11 +8,19 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.ntu.cz2006.wastegone.R;
@@ -27,6 +35,8 @@ public class RequestActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private WasteLocationRecyclerAdapter mAdapter;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseUser firebaseUser;
+    private Button cancelButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +47,7 @@ public class RequestActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mAdapter = new WasteLocationRecyclerAdapter(wasteLocationList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -48,7 +59,7 @@ public class RequestActivity extends AppCompatActivity {
     }
 
     private void prepareWaste() {
-        final CollectionReference wasteLocationCollection = db.collection("WasteLocation");
+        final Query wasteLocationCollection = db.collection("WasteLocation").whereEqualTo("requesterUid" , firebaseUser.getUid());
 
         wasteLocationCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -57,7 +68,6 @@ public class RequestActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         WasteLocation wasteLocation = document.toObject(WasteLocation.class);
                         wasteLocationList.add(wasteLocation);
-
                     }
                 }
                 mAdapter.notifyDataSetChanged();
