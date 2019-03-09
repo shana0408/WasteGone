@@ -17,6 +17,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp">
+            <TextView
+                android:id="@+id/requestId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"/>
 
         <TextView
             android:id="@+id/geopoints"
@@ -42,7 +47,7 @@
             android:layout_below="@+id/category"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/waste_image"
-            android:layout_toLeftOf="@+id/status"/>
+            android:layout_toLeftOf="@+id/status" />
 
             <Button
                 android:id="@+id/status"
