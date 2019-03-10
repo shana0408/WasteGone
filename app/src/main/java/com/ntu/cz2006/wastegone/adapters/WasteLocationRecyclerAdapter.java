@@ -1,8 +1,5 @@
 package com.ntu.cz2006.wastegone.adapters;
 
-import android.app.Activity;
-import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +10,6 @@ import android.widget.TextView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.ntu.cz2006.wastegone.R;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
-import com.ntu.cz2006.wastegone.ui.ReservationActivity;
 import com.squareup.picasso.Picasso;
 import java.util.List;
 
