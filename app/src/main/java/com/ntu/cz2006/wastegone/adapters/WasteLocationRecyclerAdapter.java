@@ -66,11 +66,26 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
 
         holder.status.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                db.collection("WasteLocation").document(wasteLocation.getId())
-                        .update("status", "open");
-                db.collection("WasteLocation").document(wasteLocation.getId())
-                        .update("collectorUid", null);
+            public void onClick(View v)
+            {
+                if(wasteLocation.getStatus().equalsIgnoreCase("reserved"))
+                {
+                    wasteLocationList.remove(position);
+                    notifyItemRemoved(position);
+                    db.collection("WasteLocation").document(wasteLocation.getId())
+                            .update("status", "open");
+                    db.collection("WasteLocation").document(wasteLocation.getId())
+                            .update("collectorUid", null);
+                }
+                else if((wasteLocation.getStatus().equalsIgnoreCase("open")))
+                {
+                    wasteLocationList.remove(position);
+                    notifyItemRemoved(position);
+                    db.collection("WasteLocation").document(wasteLocation.getId())
+                            .delete();
+
+                }
+
             }
         });
     }
@@ -79,4 +94,5 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
     public int getItemCount() {
         return wasteLocationList.size();
     }
+
 }
