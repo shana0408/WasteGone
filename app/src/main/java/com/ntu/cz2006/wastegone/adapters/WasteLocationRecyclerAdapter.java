@@ -1,5 +1,8 @@
 package com.ntu.cz2006.wastegone.adapters;
 
+import android.app.Activity;
+import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +13,7 @@ import android.widget.TextView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.ntu.cz2006.wastegone.R;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
+import com.ntu.cz2006.wastegone.ui.ReservationActivity;
 import com.squareup.picasso.Picasso;
 import java.util.List;
 
@@ -46,7 +50,7 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, final int position) {
         final WasteLocation wasteLocation = wasteLocationList.get(position);
         holder.requestId.setText(wasteLocation.getId());
         boolean isOpen = wasteLocation.getStatus().equalsIgnoreCase("open");
@@ -56,20 +60,16 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
         holder.remarks.setText("Remarks: " + wasteLocation.getRemarks());
         holder.geopoints.setText(wasteLocation.getGeo_point().toString());
         Picasso.get().load(wasteLocation.getImageUri()).into(holder.wasteImage);
-//        holder.status.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Task<Void> wasteLocationCollection = db.collection("WasteLocation").document(wasteLocation.getId())
-//                        .update("status", null)
-//                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Log.d(TAG, "showWasteOnMap: " + wasteLocation.getId());
-//                                Delete here
-//                            }
-//                        });
-//        }
-//        });
+
+        holder.status.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.collection("WasteLocation").document(wasteLocation.getId())
+                        .update("status", "open");
+                db.collection("WasteLocation").document(wasteLocation.getId())
+                        .update("collectorUid", null);
+            }
+        });
     }
 
     @Override
