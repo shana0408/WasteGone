@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -70,7 +72,10 @@ import com.ntu.cz2006.wastegone.models.User;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.Nullable;
 
@@ -522,7 +527,7 @@ public class MapsActivity extends AppCompatActivity implements
         }).addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-            GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            final GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
             WasteLocation wasteLocation = new WasteLocation(firebaseUser.getUid(), null, geoPoint,
                 categorySpinner.getSelectedItem().toString(), remarksInput.getText().toString(),
@@ -532,7 +537,8 @@ public class MapsActivity extends AppCompatActivity implements
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(MapsActivity.this, "WasteLocation added", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MapsActivity.this, "WasteLocation added", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapsActivity.this, getAddressName(geoPoint), Toast.LENGTH_SHORT).show();
                         submitProgressBar.setVisibility(View.INVISIBLE);
                         submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                     }
@@ -546,6 +552,19 @@ public class MapsActivity extends AppCompatActivity implements
                 });
             }
         });
+    }
+
+    private String getAddressName(GeoPoint geoPoint)
+    {
+        String myAddress = "";
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try{
+            List<Address> addresses = geocoder.getFromLocation(geoPoint.getLatitude(),geoPoint.getLongitude(),1);
+            myAddress = addresses.get(0).getAddressLine(0);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return myAddress;
     }
 
     private String getFileExtension(Uri uri) {
