@@ -422,8 +422,9 @@ public class MapsActivity extends AppCompatActivity implements
                                     }
                                     break;
                                 case MODIFIED:
-                                    if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_RESERVED) &&
-                                        wasteLocation.getCollectorUid().equals(firebaseUser.getUid())) {
+                                    if ((wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_RESERVED) &&
+                                        wasteLocation.getCollectorUid().equals(firebaseUser.getUid())) ||
+                                        wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_OPEN)) {
                                         if (existingMarker != null) {
                                             existingMarker.setPosition(latlng);
                                             existingMarker.setTitle(wasteLocation.getCategory());
