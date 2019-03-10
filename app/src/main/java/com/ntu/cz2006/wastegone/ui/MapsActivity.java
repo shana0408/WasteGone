@@ -283,7 +283,7 @@ public class MapsActivity extends AppCompatActivity implements
         final CollectionReference wasteLocationCollection = db.collection("WasteLocation");
 
         wasteLocationCollection
-                .whereEqualTo("status", "open").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .whereEqualTo("status", WASTE_LOCATION_STATUS_OPEN).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
             if (task.isSuccessful()) {
@@ -304,7 +304,7 @@ public class MapsActivity extends AppCompatActivity implements
         });
 
         wasteLocationCollection
-                .whereEqualTo("status", "reserved")
+                .whereEqualTo("status", WASTE_LOCATION_STATUS_RESERVED)
                 .whereEqualTo("collectorUid", firebaseUser.getUid())
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -327,7 +327,7 @@ public class MapsActivity extends AppCompatActivity implements
         });
 
         wasteLocationCollection
-                .whereEqualTo("status", "open")
+                .whereEqualTo("status", WASTE_LOCATION_STATUS_OPEN)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -358,7 +358,7 @@ public class MapsActivity extends AppCompatActivity implements
                             }
                             break;
                         case MODIFIED:
-                            if (wasteLocation.getStatus().equals("open")) {
+                            if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_OPEN)) {
                                 if (existingMarker != null) {
                                     existingMarker.setPosition(latlng);
                                     existingMarker.setTitle(wasteLocation.getCategory());
@@ -385,7 +385,7 @@ public class MapsActivity extends AppCompatActivity implements
         });
 
         wasteLocationCollection
-                .whereEqualTo("status", "reserved")
+                .whereEqualTo("status", WASTE_LOCATION_STATUS_RESERVED)
                 .whereEqualTo("collectorUid", firebaseUser.getUid())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -417,7 +417,8 @@ public class MapsActivity extends AppCompatActivity implements
                                     }
                                     break;
                                 case MODIFIED:
-                                    if (wasteLocation.getStatus().equals("open")) {
+                                    if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_RESERVED) &&
+                                        wasteLocation.getCollectorUid().equals(firebaseUser.getUid())) {
                                         if (existingMarker != null) {
                                             existingMarker.setPosition(latlng);
                                             existingMarker.setTitle(wasteLocation.getCategory());
