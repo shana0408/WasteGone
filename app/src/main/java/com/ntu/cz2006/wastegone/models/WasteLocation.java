@@ -15,7 +15,8 @@ public class WasteLocation {
     /**
      * FireStore Document reference id
      */
-    @Exclude private String id;
+    @Exclude
+    private String id;
 
     /**
      * requester id
@@ -73,6 +74,7 @@ public class WasteLocation {
      * Gets unique ID.
      * @return unique ID.
      */
+    @Exclude
     public String getId() {
         return id;
     }
@@ -81,6 +83,7 @@ public class WasteLocation {
      * Changes unique id
      * @param id set unique id.
      */
+    @Exclude
     public void setId(String id) {
         this.id = id;
     }
