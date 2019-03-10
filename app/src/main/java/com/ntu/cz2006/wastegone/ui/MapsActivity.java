@@ -70,6 +70,8 @@ import com.ntu.cz2006.wastegone.models.User;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
+
 import javax.annotation.Nullable;
 
 import static com.ntu.cz2006.wastegone.Constants.*;
@@ -105,7 +107,8 @@ public class MapsActivity extends AppCompatActivity implements
     private Button submitRequestButton;
     private Spinner categorySpinner;
     private EditText remarksInput;
-    private ImageView uploadImagePreview;
+    private Uri selectedImage;
+    private ImageView uploadImageButton;
     private ImageView showImage;
     private ProgressBar submitProgressBar;
 
@@ -126,7 +129,7 @@ public class MapsActivity extends AppCompatActivity implements
     private TextView userRewardsTextView;
     private ImageView userProfileImageView;
 
-    private Uri selectedImage;
+    private HashMap<String, Marker> mapMarkerManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +138,8 @@ public class MapsActivity extends AppCompatActivity implements
 
         mFusedLocationProviderClient = new FusedLocationProviderClient(this);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        mapMarkerManager = new HashMap<String, Marker>();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -160,7 +165,7 @@ public class MapsActivity extends AppCompatActivity implements
         submitRequestButton = submitFormBottomSheet.findViewById(R.id.submitRequestButton);
         categorySpinner = submitFormBottomSheet.findViewById(R.id.categorySpinner);
         remarksInput = submitFormBottomSheet.findViewById(R.id.remarksInput);
-        uploadImagePreview = submitFormBottomSheet.findViewById(R.id.uploadImagePreview);
+        uploadImageButton = submitFormBottomSheet.findViewById(R.id.uploadImageButton);
         showImage = submitFormBottomSheet.findViewById(R.id.showImage);
         submitProgressBar = submitFormBottomSheet.findViewById(R.id.submitRequestProgressBar);
 
@@ -255,7 +260,7 @@ public class MapsActivity extends AppCompatActivity implements
             }
         });
 
-        uploadImagePreview.setOnClickListener(new View.OnClickListener() {
+        uploadImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View c) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -288,6 +293,8 @@ public class MapsActivity extends AppCompatActivity implements
                     LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
                     Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
                     marker.setTag(wasteLocation);
+
+                    mapMarkerManager.put(wasteLocation.getId(), marker);
                 }
             }
             }
@@ -301,15 +308,37 @@ public class MapsActivity extends AppCompatActivity implements
             }
 
             for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
+                WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
+                wasteLocation.setId(dc.getDocument().getId());
+                LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+
                 switch (dc.getType()) {
                     case ADDED:
-                        WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
-                        wasteLocation.setId(dc.getDocument().getId());
-                        LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+                        Log.d(TAG, "dc.getType: ADDED");
                         Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
                         marker.setTag(wasteLocation);
+                        mapMarkerManager.put(wasteLocation.getId(), marker);
+                        break;
                     case REMOVED:
-                        return;
+                        Log.d(TAG, "dc.getType: REMOVE");
+                        Marker markerToRemove = mapMarkerManager.get(wasteLocation.getId());
+                        if (markerToRemove != null) {
+                            markerToRemove.remove();
+                            mapMarkerManager.remove(wasteLocation.getId());
+                        }
+                        break;
+                    case MODIFIED:
+                        Log.d(TAG, "dc.getType: MODIFIED");
+                        Marker markerToModified = mapMarkerManager.get(wasteLocation.getId());
+
+                        if (markerToModified != null) {
+                            markerToModified.setPosition(latlng);
+                            markerToModified.setTitle(wasteLocation.getCategory());
+                            markerToModified.setTag(wasteLocation);
+
+                            mapMarkerManager.put(wasteLocation.getId(), markerToModified);
+                        }
+                        break;
                 }
             }
             }

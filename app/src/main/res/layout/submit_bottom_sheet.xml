@@ -44,12 +44,12 @@
                 android:layout_width="329dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:layout_toLeftOf="@id/uploadImagePreview"
+                android:layout_toLeftOf="@id/uploadImageButton"
                 android:hint="Remarks/Address"
                 android:inputType="text" />
 
             <ImageView
-                android:id="@+id/uploadImagePreview"
+                android:id="@+id/uploadImageButton"
                 android:layout_width="60dp"
                 android:layout_height="37dp"
                 android:layout_toRightOf="@id/remarksInput"
