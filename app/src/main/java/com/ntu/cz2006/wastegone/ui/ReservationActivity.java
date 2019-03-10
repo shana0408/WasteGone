@@ -25,6 +25,13 @@ import com.ntu.cz2006.wastegone.models.WasteLocation;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ ReservationActivity class show a form for user to make reservation and handling its logic
+ @author ILoveNTU
+ @version 2.1
+ @since 2019-01-15
+ */
+
 public class ReservationActivity extends AppCompatActivity {
     private List<WasteLocation> wasteLocationList = new ArrayList<>();
     private RecyclerView recyclerView;

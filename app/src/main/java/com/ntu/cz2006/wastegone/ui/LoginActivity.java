@@ -33,6 +33,13 @@ import java.util.Map;
 
 import static com.ntu.cz2006.wastegone.Constants.REQUEST_CODE_SIGN_IN;
 
+/**
+ LoginActivity class handles user login
+ @author ILoveNTU
+ @version 2.1
+ @since 2019-01-15
+ */
+
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private GoogleSignInClient mGoogleSignInClient;

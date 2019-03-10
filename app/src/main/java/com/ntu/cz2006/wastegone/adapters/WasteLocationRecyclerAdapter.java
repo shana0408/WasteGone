@@ -17,6 +17,13 @@ import com.ntu.cz2006.wastegone.ui.ReservationActivity;
 import com.squareup.picasso.Picasso;
 import java.util.List;
 
+/**
+ An adapter to generate recycleview for wastelocation
+ @author ILoveNTU
+ @version 2.1
+ @since 2019-01-15
+ */
+
 public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLocationRecyclerAdapter.MyViewHolder> {
 
     private List<WasteLocation> wasteLocationList;
