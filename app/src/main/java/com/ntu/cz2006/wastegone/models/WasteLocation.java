@@ -11,11 +11,12 @@ import com.google.firebase.firestore.GeoPoint;
  */
 
 public class WasteLocation {
-    @Exclude
+
     /**
-     * unique id
+     * FireStore Document reference id
      */
-    private String id;
+    @Exclude private String id;
+
     /**
      * requester id
      */
