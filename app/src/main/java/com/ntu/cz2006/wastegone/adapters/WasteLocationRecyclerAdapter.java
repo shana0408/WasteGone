@@ -53,7 +53,7 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, final int position) {
         final WasteLocation wasteLocation = wasteLocationList.get(position);
         holder.requestId.setText(wasteLocation.getId());
         boolean isOpen = wasteLocation.getStatus().equalsIgnoreCase("open");
@@ -63,20 +63,16 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
         holder.remarks.setText("Remarks: " + wasteLocation.getRemarks());
         holder.geopoints.setText(wasteLocation.getGeo_point().toString());
         Picasso.get().load(wasteLocation.getImageUri()).into(holder.wasteImage);
-//        holder.status.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Task<Void> wasteLocationCollection = db.collection("WasteLocation").document(wasteLocation.getId())
-//                        .update("status", null)
-//                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Log.d(TAG, "showWasteOnMap: " + wasteLocation.getId());
-//                                Delete here
-//                            }
-//                        });
-//        }
-//        });
+
+        holder.status.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.collection("WasteLocation").document(wasteLocation.getId())
+                        .update("status", "open");
+                db.collection("WasteLocation").document(wasteLocation.getId())
+                        .update("collectorUid", null);
+            }
+        });
     }
 
     @Override
