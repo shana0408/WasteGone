@@ -74,6 +74,7 @@ public class RequestActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         WasteLocation wasteLocation = document.toObject(WasteLocation.class);
+                        wasteLocation.setId(document.getId());
                         wasteLocationList.add(wasteLocation);
                     }
                 }
