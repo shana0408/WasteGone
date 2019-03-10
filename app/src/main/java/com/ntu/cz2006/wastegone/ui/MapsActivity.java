@@ -290,12 +290,14 @@ public class MapsActivity extends AppCompatActivity implements
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     WasteLocation wasteLocation = document.toObject(WasteLocation.class);
                     wasteLocation.setId(document.getId());
-                    Log.d(TAG, "showWasteOnMap: " + wasteLocation.getRequesterUid());
-                    LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                    Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
-                    marker.setTag(wasteLocation);
 
-                    mapMarkerManager.put(wasteLocation.getId(), marker);
+                    if (mapMarkerManager.get(wasteLocation.getId()) == null) {
+                        LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+                        Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                        marker.setTag(wasteLocation);
+
+                        mapMarkerManager.put(wasteLocation.getId(), marker);
+                    }
                 }
             }
             }
@@ -311,12 +313,14 @@ public class MapsActivity extends AppCompatActivity implements
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         WasteLocation wasteLocation = document.toObject(WasteLocation.class);
                         wasteLocation.setId(document.getId());
-                        Log.d(TAG, "showWasteOnMap: " + wasteLocation.getRequesterUid());
-                        LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-                        Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
-                        marker.setTag(wasteLocation);
 
-                        mapMarkerManager.put(wasteLocation.getId(), marker);
+                        if (mapMarkerManager.get(wasteLocation.getId()) == null) {
+                            LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+                            Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                            marker.setTag(wasteLocation);
+
+                            mapMarkerManager.put(wasteLocation.getId(), marker);
+                        }
                     }
                 }
             }
@@ -327,44 +331,56 @@ public class MapsActivity extends AppCompatActivity implements
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-            if (e != null) {
-                return;
-            }
-
-            for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
-                WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
-                wasteLocation.setId(dc.getDocument().getId());
-                LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
-
-                switch (dc.getType()) {
-                    case ADDED:
-                        Log.d(TAG, "dc.getType: ADDED");
-                        Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
-                        marker.setTag(wasteLocation);
-                        mapMarkerManager.put(wasteLocation.getId(), marker);
-                        break;
-                    case REMOVED:
-                        Log.d(TAG, "dc.getType: REMOVE");
-                        Marker markerToRemove = mapMarkerManager.get(wasteLocation.getId());
-                        if (markerToRemove != null) {
-                            markerToRemove.remove();
-                            mapMarkerManager.remove(wasteLocation.getId());
-                        }
-                        break;
-                    case MODIFIED:
-                        Log.d(TAG, "dc.getType: MODIFIED");
-                        Marker markerToModified = mapMarkerManager.get(wasteLocation.getId());
-
-                        if (markerToModified != null) {
-                            markerToModified.setPosition(latlng);
-                            markerToModified.setTitle(wasteLocation.getCategory());
-                            markerToModified.setTag(wasteLocation);
-
-                            mapMarkerManager.put(wasteLocation.getId(), markerToModified);
-                        }
-                        break;
+                if (e != null) {
+                    return;
                 }
-            }
+
+                for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
+                    WasteLocation wasteLocation = dc.getDocument().toObject(WasteLocation.class);
+                    wasteLocation.setId(dc.getDocument().getId());
+                    LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
+
+                    Marker existingMarker = mapMarkerManager.get(wasteLocation.getId());
+
+                    switch (dc.getType()) {
+                        case ADDED:
+                            if (existingMarker == null) {
+                                Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                                marker.setTag(wasteLocation);
+                                mapMarkerManager.put(wasteLocation.getId(), marker);
+                            }
+
+                            break;
+                        case REMOVED:
+                            if (existingMarker != null) {
+                                existingMarker.remove();
+                                mapMarkerManager.remove(wasteLocation.getId());
+                            }
+                            break;
+                        case MODIFIED:
+                            if (wasteLocation.getStatus().equals("open")) {
+                                if (existingMarker != null) {
+                                    existingMarker.setPosition(latlng);
+                                    existingMarker.setTitle(wasteLocation.getCategory());
+                                    existingMarker.setTag(wasteLocation);
+
+                                    mapMarkerManager.put(wasteLocation.getId(), existingMarker);
+                                }
+                                else {
+                                    Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                                    marker.setTag(wasteLocation);
+                                    mapMarkerManager.put(wasteLocation.getId(), marker);
+                                }
+                            }
+                            else {
+                                if (existingMarker != null) {
+                                    existingMarker.remove();
+                                    mapMarkerManager.remove(wasteLocation.getId());
+                                }
+                            }
+                            break;
+                    }
+                }
             }
         });
 
@@ -383,31 +399,43 @@ public class MapsActivity extends AppCompatActivity implements
                             wasteLocation.setId(dc.getDocument().getId());
                             LatLng latlng = new LatLng(wasteLocation.getGeo_point().getLatitude(), wasteLocation.getGeo_point().getLongitude());
 
+                            Marker existingMarker = mapMarkerManager.get(wasteLocation.getId());
+
                             switch (dc.getType()) {
                                 case ADDED:
-                                    Log.d(TAG, "dc.getType: ADDED");
-                                    Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
-                                    marker.setTag(wasteLocation);
-                                    mapMarkerManager.put(wasteLocation.getId(), marker);
+                                    if (existingMarker == null) {
+                                        Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                                        marker.setTag(wasteLocation);
+                                        mapMarkerManager.put(wasteLocation.getId(), marker);
+                                    }
+
                                     break;
                                 case REMOVED:
-                                    Log.d(TAG, "dc.getType: REMOVE");
-                                    Marker markerToRemove = mapMarkerManager.get(wasteLocation.getId());
-                                    if (markerToRemove != null) {
-                                        markerToRemove.remove();
+                                    if (existingMarker != null) {
+                                        existingMarker.remove();
                                         mapMarkerManager.remove(wasteLocation.getId());
                                     }
                                     break;
                                 case MODIFIED:
-                                    Log.d(TAG, "dc.getType: MODIFIED");
-                                    Marker markerToModified = mapMarkerManager.get(wasteLocation.getId());
+                                    if (wasteLocation.getStatus().equals("open")) {
+                                        if (existingMarker != null) {
+                                            existingMarker.setPosition(latlng);
+                                            existingMarker.setTitle(wasteLocation.getCategory());
+                                            existingMarker.setTag(wasteLocation);
 
-                                    if (markerToModified != null) {
-                                        markerToModified.setPosition(latlng);
-                                        markerToModified.setTitle(wasteLocation.getCategory());
-                                        markerToModified.setTag(wasteLocation);
-
-                                        mapMarkerManager.put(wasteLocation.getId(), markerToModified);
+                                            mapMarkerManager.put(wasteLocation.getId(), existingMarker);
+                                        }
+                                        else {
+                                            Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(wasteLocation.getCategory()));
+                                            marker.setTag(wasteLocation);
+                                            mapMarkerManager.put(wasteLocation.getId(), marker);
+                                        }
+                                    }
+                                    else {
+                                        if (existingMarker != null) {
+                                            existingMarker.remove();
+                                            mapMarkerManager.remove(wasteLocation.getId());
+                                        }
                                     }
                                     break;
                             }
