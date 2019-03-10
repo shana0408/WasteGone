@@ -6,6 +6,13 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.ntu.cz2006.wastegone.R;
 
+/**
+ WelcomeActivity class show welcome page to user
+ @author ILoveNTU
+ @version 2.1
+ @since 2019-01-15
+ */
+
 public class WelcomeActivity extends AppCompatActivity {
 
     @Override

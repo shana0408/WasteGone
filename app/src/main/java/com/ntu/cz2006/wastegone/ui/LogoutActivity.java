@@ -13,6 +13,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.ntu.cz2006.wastegone.R;
 
+/**
+ LogoutActivity class handles user logout
+ @author ILoveNTU
+ @version 2.1
+ @since 2019-01-15
+ */
+
 public class LogoutActivity extends AppCompatActivity {
 
     GoogleSignInClient mGoogleSignInClient;

@@ -74,6 +74,14 @@ import javax.annotation.Nullable;
 
 import static com.ntu.cz2006.wastegone.Constants.*;
 
+/**
+ MapActivity class displays map , waste location and handling submit request, make
+ reservation activity.
+ @author ILoveNTU
+ @version 2.1
+ @since 2019-01-15
+ */
+
 public class MapsActivity extends AppCompatActivity implements
         OnMapReadyCallback, OnMarkerClickListener, NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "MapsActivity";

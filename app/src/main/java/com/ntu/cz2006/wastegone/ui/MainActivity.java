@@ -26,6 +26,13 @@ import static com.ntu.cz2006.wastegone.Constants.PERMISSIONS_REQUEST_ACCESS_FINE
 import static com.ntu.cz2006.wastegone.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
 import static com.ntu.cz2006.wastegone.Constants.PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
 
+/**
+ MainActivity class initial all API and check permission, then redirect user to the correct page.
+ @author ILoveNTU
+ @version 2.1
+ @since 2019-01-15
+ */
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private boolean mLocationPermissionGranted = false;
