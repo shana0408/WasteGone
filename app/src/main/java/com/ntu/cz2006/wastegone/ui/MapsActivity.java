@@ -541,7 +541,7 @@ public class MapsActivity extends AppCompatActivity implements
 
             WasteLocation wasteLocation = new WasteLocation(firebaseUser.getUid(), null, geoPoint,
                 categorySpinner.getSelectedItem().toString(), remarksInput.getText().toString(),
-                uri.toString(), WASTE_LOCATION_STATUS_OPEN);
+                uri.toString(), WASTE_LOCATION_STATUS_OPEN, addressInput.getText().toString());
 
             db.collection("WasteLocation").document().set(wasteLocation)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {

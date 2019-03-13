@@ -47,6 +47,8 @@ public class WasteLocation {
      */
     private String status;
 
+    private String address;
+
     public WasteLocation() {
     }
 
@@ -60,7 +62,7 @@ public class WasteLocation {
      * @param imageUri requester upload image.
      * @param status request's status.
      */
-    public WasteLocation(String requesterUid, String collectorUid, GeoPoint geo_point, String category, String remarks, String imageUri, String status) {
+    public WasteLocation(String requesterUid, String collectorUid, GeoPoint geo_point, String category, String remarks, String imageUri, String status, String address) {
         this.requesterUid = requesterUid;
         this.collectorUid = collectorUid;
         this.geo_point = geo_point;
@@ -68,6 +70,7 @@ public class WasteLocation {
         this.remarks = remarks;
         this.imageUri = imageUri;
         this.status = status;
+        this.address = address;
     }
 
     /**
@@ -193,4 +196,8 @@ public class WasteLocation {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getAddress() {return  address;}
+
+    public  void setAddress(String address) { this.address = address;}
 }

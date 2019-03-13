@@ -26,7 +26,7 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView status, category, remarks, geopoints, requestId;
+        public TextView status, category, remarks, address, requestId;
         public ImageView wasteImage;
 
         public MyViewHolder(View view) {
@@ -35,7 +35,7 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
             status = (TextView) view.findViewById(R.id.status);
             category = (TextView) view.findViewById(R.id.category);
             remarks = (TextView) view.findViewById(R.id.remarks);
-            geopoints = (TextView) view.findViewById(R.id.geopoints);
+            address = (TextView) view.findViewById(R.id.geopoints);
             wasteImage = (ImageView) view.findViewById(R.id.waste_image);
         }
     }
@@ -59,9 +59,9 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
         boolean isOpen = wasteLocation.getStatus().equalsIgnoreCase("open");
         boolean isReserve = wasteLocation.getStatus().equalsIgnoreCase("reserved");
         holder.status.setText(isOpen ? "cancel" : isReserve ? "cancel" : wasteLocation.getStatus());
-        holder.category.setText("Category： "  + wasteLocation.getCategory());
+        holder.category.setText("Category "  + wasteLocation.getCategory());
         holder.remarks.setText("Remarks: " + wasteLocation.getRemarks());
-        holder.geopoints.setText(wasteLocation.getGeo_point().toString());
+        holder.address.setText("Address: " + wasteLocation.getAddress());
         Picasso.get().load(wasteLocation.getImageUri()).into(holder.wasteImage);
 
         holder.status.setOnClickListener(new View.OnClickListener() {
