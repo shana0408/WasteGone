@@ -25,11 +25,17 @@
         android:textAlignment="center"/>
 
     <TextView
+        android:id="@+id/addressTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/wasteImageView"
+        android:layout_weight="3"/>
+
+    <TextView
         android:id="@+id/remarksTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/titleTextView"
-        android:layout_toLeftOf="@+id/wasteImageView"
+        android:layout_below="@id/addressTextView"
         android:layout_weight="3"/>
 
     <TextView
@@ -37,7 +43,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/remarksTextView"
-        android:layout_toLeftOf="@+id/wasteImageView"
         android:layout_weight="3"/>
 
     <TextView
@@ -45,7 +50,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/statusTextView"
-        android:layout_toLeftOf="@+id/wasteImageView"
         android:layout_weight="3"/>
 
     <ImageView
@@ -53,8 +57,7 @@
         android:layout_width="wrap_content"
         android:layout_height="160dp"
         android:layout_below="@id/titleTextView"
-        android:layout_alignStart="@+id/reserveRequestProgressBar"
-        android:layout_alignParentRight="true"
+        android:layout_centerHorizontal="true"
         android:layout_weight="7" />
 
     <Button
@@ -65,7 +68,7 @@
         android:text="Button"
         android:background="#000"
         android:textColor="#fff"
-        android:layout_below="@id/wasteImageView"/>
+        android:layout_below="@id/requesterNameTextView"/>
 
     <ProgressBar
         android:id="@+id/reserveRequestProgressBar"

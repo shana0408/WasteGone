@@ -126,6 +126,7 @@ public class MapsActivity extends AppCompatActivity implements
     private ImageView wasteImageView;
     private Button reserveCollectButton;
     private ProgressBar reserveProgressBar;
+    private TextView addressTextView;
 
     //Navigation Drawer
     private NavigationView navigationView;
@@ -183,6 +184,7 @@ public class MapsActivity extends AppCompatActivity implements
         wasteImageView = wasteLocationDetailBottomSheet.findViewById(R.id.wasteImageView);
         reserveCollectButton = wasteLocationDetailBottomSheet.findViewById(R.id.reserveCollectButton);
         reserveProgressBar = wasteLocationDetailBottomSheet.findViewById(R.id.reserveRequestProgressBar);
+        addressTextView = wasteLocationDetailBottomSheet.findViewById(R.id.addressTextView);
 
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -685,6 +687,7 @@ public class MapsActivity extends AppCompatActivity implements
             final WasteLocation wasteLocation = (WasteLocation) marker.getTag();
 
             titleTextView.setText(wasteLocation.getCategory());
+            addressTextView.setText("Address: " + wasteLocation.getAddress());
             remarksTextView.setText("Remarks: " + wasteLocation.getRemarks());
             statusTextView.setText("Status: " + wasteLocation.getStatus());
 
