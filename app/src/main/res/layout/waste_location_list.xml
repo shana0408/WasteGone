@@ -49,6 +49,46 @@
             android:layout_toRightOf="@id/waste_image"
             android:layout_toLeftOf="@+id/status" />
 
+
+            <TextView
+                android:id="@+id/submitDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/remarks"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@id/waste_image"
+                android:layout_toLeftOf="@+id/status" />
+
+
+            <TextView
+                android:id="@+id/requesterUid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/submitDate"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@id/waste_image"
+                android:layout_toLeftOf="@+id/status" />
+
+            <TextView
+                android:id="@+id/collectorUid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/requesterUid"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@id/waste_image"
+                android:layout_toLeftOf="@+id/status" />
+
+
+            <TextView
+                android:id="@+id/reserveDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/collectorUid"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@id/waste_image"
+                android:layout_toLeftOf="@+id/status" />
+
+
             <Button
                 android:id="@+id/status"
                 android:layout_width="wrap_content"
@@ -62,6 +102,7 @@
             android:id="@+id/waste_image"
             android:layout_width="80dp"
             android:layout_height="80dp"
+            android:layout_centerVertical="true"
             android:src="@mipmap/wastegone_icon_round" />
 
 

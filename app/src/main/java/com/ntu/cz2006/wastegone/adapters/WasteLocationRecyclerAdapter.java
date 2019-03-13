@@ -7,8 +7,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.ntu.cz2006.wastegone.R;
+import com.ntu.cz2006.wastegone.models.User;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
 import java.util.List;
@@ -26,7 +29,7 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView status, category, remarks, address, requestId;
+        public TextView status, category, remarks, address, requestId ,requesterUid, collectorUid, submitDate, reserveDate;
         public ImageView wasteImage;
 
         public MyViewHolder(View view) {
@@ -37,6 +40,10 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
             remarks = (TextView) view.findViewById(R.id.remarks);
             address = (TextView) view.findViewById(R.id.geopoints);
             wasteImage = (ImageView) view.findViewById(R.id.waste_image);
+            requesterUid = (TextView) view.findViewById(R.id.requesterUid);
+            collectorUid = (TextView) view.findViewById(R.id.collectorUid);
+            submitDate = (TextView) view.findViewById(R.id.submitDate);
+            reserveDate = (TextView) view.findViewById(R.id.reserveDate);
         }
     }
 
@@ -62,6 +69,27 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
         holder.category.setText("Category "  + wasteLocation.getCategory());
         holder.remarks.setText("Remarks: " + wasteLocation.getRemarks());
         holder.address.setText("Address: " + wasteLocation.getAddress());
+        holder.submitDate.setText("Submit Date: " +  wasteLocation.getSubmitDate());
+        holder.reserveDate.setText("Reserve Date: " + wasteLocation.getReserveDate());
+        db.collection("User").document(wasteLocation.getRequesterUid()).get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        User user = documentSnapshot.toObject(User.class);
+                        holder.requesterUid.setText("Drop by: " + user.getName());
+                    }
+                });
+        if(wasteLocation.getCollectorUid() != null)
+        {
+            db.collection("User").document(wasteLocation.getCollectorUid()).get()
+                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            User user = documentSnapshot.toObject(User.class);
+                            holder.collectorUid.setText("Collect by: " + user.getName());
+                        }
+                    });
+        }
         Picasso.get().load(wasteLocation.getImageUri()).into(holder.wasteImage);
 
         holder.status.setOnClickListener(new View.OnClickListener() {

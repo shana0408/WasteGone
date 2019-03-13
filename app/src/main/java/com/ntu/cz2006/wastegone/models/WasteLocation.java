@@ -3,6 +3,8 @@ package com.ntu.cz2006.wastegone.models;
 import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.util.Date;
+
 /**
  WasteLocation class store waste material's information
  @author ILoveNTU
@@ -49,6 +51,10 @@ public class WasteLocation {
 
     private String address;
 
+    private Date submitDate;
+
+    private Date reserveDate;
+
     public WasteLocation() {
     }
 
@@ -62,7 +68,7 @@ public class WasteLocation {
      * @param imageUri requester upload image.
      * @param status request's status.
      */
-    public WasteLocation(String requesterUid, String collectorUid, GeoPoint geo_point, String category, String remarks, String imageUri, String status, String address) {
+    public WasteLocation(String requesterUid, String collectorUid, GeoPoint geo_point, String category, String remarks, String imageUri, String status, String address, Date submitDate,  Date reserveDate) {
         this.requesterUid = requesterUid;
         this.collectorUid = collectorUid;
         this.geo_point = geo_point;
@@ -71,6 +77,8 @@ public class WasteLocation {
         this.imageUri = imageUri;
         this.status = status;
         this.address = address;
+        this.submitDate = submitDate;
+        this.reserveDate = reserveDate;
     }
 
     /**
@@ -200,4 +208,12 @@ public class WasteLocation {
     public String getAddress() {return  address;}
 
     public  void setAddress(String address) { this.address = address;}
+
+    public Date getSubmitDate() {return  submitDate;}
+
+    public  void setSubmitDate(Date submitDate) { this.submitDate = submitDate;}
+
+    public Date getReserveDate() {return  reserveDate;}
+
+    public  void setReserveDate(Date submitDate) { this.reserveDate = reserveDate;}
 }

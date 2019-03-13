@@ -52,6 +52,13 @@
         android:layout_below="@id/statusTextView"
         android:layout_weight="3"/>
 
+    <TextView
+        android:id="@+id/submitDateView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/requesterNameTextView"
+        android:layout_weight="3"/>
+
     <ImageView
         android:id="@+id/wasteImageView"
         android:layout_width="wrap_content"

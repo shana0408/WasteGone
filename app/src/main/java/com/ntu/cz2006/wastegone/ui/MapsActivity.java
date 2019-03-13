@@ -73,6 +73,8 @@ import com.ntu.cz2006.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -127,6 +129,7 @@ public class MapsActivity extends AppCompatActivity implements
     private Button reserveCollectButton;
     private ProgressBar reserveProgressBar;
     private TextView addressTextView;
+    private TextView submitDateView;
 
     //Navigation Drawer
     private NavigationView navigationView;
@@ -185,6 +188,7 @@ public class MapsActivity extends AppCompatActivity implements
         reserveCollectButton = wasteLocationDetailBottomSheet.findViewById(R.id.reserveCollectButton);
         reserveProgressBar = wasteLocationDetailBottomSheet.findViewById(R.id.reserveRequestProgressBar);
         addressTextView = wasteLocationDetailBottomSheet.findViewById(R.id.addressTextView);
+        submitDateView = wasteLocationDetailBottomSheet.findViewById(R.id.submitDateView);
 
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -540,10 +544,11 @@ public class MapsActivity extends AppCompatActivity implements
 
             final GeoPoint geoPoint = getLocationFromAddress(addressInput.getText().toString());
 
+            Date submitDate = Calendar.getInstance().getTime();
 
             WasteLocation wasteLocation = new WasteLocation(firebaseUser.getUid(), null, geoPoint,
                 categorySpinner.getSelectedItem().toString(), remarksInput.getText().toString(),
-                uri.toString(), WASTE_LOCATION_STATUS_OPEN, addressInput.getText().toString());
+                uri.toString(), WASTE_LOCATION_STATUS_OPEN, addressInput.getText().toString(), submitDate, null);
 
             db.collection("WasteLocation").document().set(wasteLocation)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -690,6 +695,7 @@ public class MapsActivity extends AppCompatActivity implements
             addressTextView.setText("Address: " + wasteLocation.getAddress());
             remarksTextView.setText("Remarks: " + wasteLocation.getRemarks());
             statusTextView.setText("Status: " + wasteLocation.getStatus());
+            submitDateView.setText("Submit Date: " + wasteLocation.getSubmitDate());
 
             if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_OPEN)) {
                 reserveCollectButton.setText("Reserve");
@@ -741,10 +747,12 @@ public class MapsActivity extends AppCompatActivity implements
     private void reserveCollectRequest(View v) {
         Button button = (Button) v;
         WasteLocation wasteLocation = (WasteLocation) button.getTag();
+        Date reserveDate = Calendar.getInstance().getTime();
 
         if (button.getText().equals("Reserve")) {
             wasteLocation.setCollectorUid(firebaseUser.getUid());
             wasteLocation.setStatus(WASTE_LOCATION_STATUS_RESERVED);
+            wasteLocation.setReserveDate(reserveDate);
         }
         else if (button.getText().equals("Collect")) {
             wasteLocation.setCollectorUid(firebaseUser.getUid());
