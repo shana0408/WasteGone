@@ -116,6 +116,7 @@ public class MapsActivity extends AppCompatActivity implements
     private ImageView uploadImageButton;
     private ImageView showImage;
     private ProgressBar submitProgressBar;
+    private EditText addressInput;
 
     //Waste Location Detail BottomSheet
     private TextView titleTextView;
@@ -173,6 +174,7 @@ public class MapsActivity extends AppCompatActivity implements
         uploadImageButton = submitFormBottomSheet.findViewById(R.id.uploadImageButton);
         showImage = submitFormBottomSheet.findViewById(R.id.showImage);
         submitProgressBar = submitFormBottomSheet.findViewById(R.id.submitRequestProgressBar);
+        addressInput = submitFormBottomSheet.findViewById(R.id.addressInput);
 
         titleTextView = wasteLocationDetailBottomSheet.findViewById(R.id.titleTextView);
         remarksTextView = wasteLocationDetailBottomSheet.findViewById(R.id.remarksTextView);
@@ -229,7 +231,9 @@ public class MapsActivity extends AppCompatActivity implements
                     mLastLocation = task.getResult();
                     LatLng latlng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                     CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latlng, DEFAULT_ZOOM);
+                    GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                     mMap.moveCamera(cameraUpdate);
+                    addressInput.setText(getAddressName(geoPoint));
                 }
             }
         });
@@ -480,6 +484,8 @@ public class MapsActivity extends AppCompatActivity implements
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latlng, DEFAULT_ZOOM);
                 mMap.animateCamera(cameraUpdate);
                 myLocationButton.setColorFilter(Color.argb(255,88,150,228));
+                GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                addressInput.setText(getAddressName(geoPoint));
             }
             }
         });
@@ -528,7 +534,10 @@ public class MapsActivity extends AppCompatActivity implements
         }).addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-            final GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            //final GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
+            final GeoPoint geoPoint = getLocationFromAddress(addressInput.getText().toString());
+
 
             WasteLocation wasteLocation = new WasteLocation(firebaseUser.getUid(), null, geoPoint,
                 categorySpinner.getSelectedItem().toString(), remarksInput.getText().toString(),
@@ -538,8 +547,7 @@ public class MapsActivity extends AppCompatActivity implements
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-//                        Toast.makeText(MapsActivity.this, "WasteLocation added", Toast.LENGTH_SHORT).show();
-                        Toast.makeText(MapsActivity.this, getAddressName(geoPoint), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapsActivity.this, "WasteLocation added", Toast.LENGTH_SHORT).show();
                         submitProgressBar.setVisibility(View.INVISIBLE);
                         submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                     }
@@ -566,6 +574,30 @@ public class MapsActivity extends AppCompatActivity implements
             e.printStackTrace();
         }
         return myAddress;
+    }
+
+    public GeoPoint getLocationFromAddress(String strAddress) {
+
+        Geocoder coder = new Geocoder(this);
+        List<Address> address;
+        GeoPoint p1 = null;
+
+        try {
+            // May throw an IOException
+            address = coder.getFromLocationName(strAddress, 5);
+            if (address == null) {
+                return null;
+            }
+
+            Address location = address.get(0);
+            p1 = new GeoPoint(location.getLatitude(), location.getLongitude() );
+
+        } catch (IOException ex) {
+
+            ex.printStackTrace();
+        }
+
+        return p1;
     }
 
     private String getFileExtension(Uri uri) {
