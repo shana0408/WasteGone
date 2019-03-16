@@ -29,7 +29,7 @@
             android:layout_marginBottom="16dp" />
 
 
-    <EditText
+    <TextView
         android:id="@+id/addressInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="120dp"
         android:orientation="horizontal"
         android:weightSum="10">
 

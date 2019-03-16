@@ -53,7 +53,7 @@ public class WasteLocation {
 
     private Date submitDate;
 
-    private Date reserveDate;
+    private Date collectDate;
 
     public WasteLocation() {
     }
@@ -68,7 +68,7 @@ public class WasteLocation {
      * @param imageUri requester upload image.
      * @param status request's status.
      */
-    public WasteLocation(String requesterUid, String collectorUid, GeoPoint geo_point, String category, String remarks, String imageUri, String status, String address, Date submitDate,  Date reserveDate) {
+    public WasteLocation(String requesterUid, String collectorUid, GeoPoint geo_point, String category, String remarks, String imageUri, String status, String address, Date submitDate,  Date collectDate) {
         this.requesterUid = requesterUid;
         this.collectorUid = collectorUid;
         this.geo_point = geo_point;
@@ -78,7 +78,7 @@ public class WasteLocation {
         this.status = status;
         this.address = address;
         this.submitDate = submitDate;
-        this.reserveDate = reserveDate;
+        this.collectDate = collectDate;
     }
 
     /**
@@ -213,7 +213,11 @@ public class WasteLocation {
 
     public  void setSubmitDate(Date submitDate) { this.submitDate = submitDate;}
 
-    public Date getReserveDate() {return  reserveDate;}
+    public Date getCollectDate() {
+        return collectDate;
+    }
 
-    public  void setReserveDate(Date submitDate) { this.reserveDate = reserveDate;}
+    public void setCollectDate(Date collectDate) {
+        this.collectDate = collectDate;
+    }
 }

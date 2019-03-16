@@ -14,7 +14,11 @@ import com.ntu.cz2006.wastegone.R;
 import com.ntu.cz2006.wastegone.models.User;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
+
+import java.text.SimpleDateFormat;
 import java.util.List;
+
+import static com.ntu.cz2006.wastegone.Constants.*;
 
 /**
  An adapter to generate recycleview for wastelocation
@@ -29,21 +33,21 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView status, category, remarks, address, requestId ,requesterUid, collectorUid, submitDate, reserveDate;
+        public TextView status, category, remarks, address, requestId ,requesterUid, collectorUid, submitDate, collectDate;
         public ImageView wasteImage;
 
         public MyViewHolder(View view) {
             super(view);
-            requestId = (TextView) view.findViewById(R.id.requestId);
-            status = (TextView) view.findViewById(R.id.status);
-            category = (TextView) view.findViewById(R.id.category);
-            remarks = (TextView) view.findViewById(R.id.remarks);
-            address = (TextView) view.findViewById(R.id.geopoints);
-            wasteImage = (ImageView) view.findViewById(R.id.waste_image);
-            requesterUid = (TextView) view.findViewById(R.id.requesterUid);
-            collectorUid = (TextView) view.findViewById(R.id.collectorUid);
-            submitDate = (TextView) view.findViewById(R.id.submitDate);
-            reserveDate = (TextView) view.findViewById(R.id.reserveDate);
+            requestId =  view.findViewById(R.id.requestId);
+            status =  view.findViewById(R.id.status);
+            category =  view.findViewById(R.id.category);
+            remarks =  view.findViewById(R.id.remarks);
+            address =  view.findViewById(R.id.geopoints);
+            wasteImage = view.findViewById(R.id.waste_image);
+            requesterUid =  view.findViewById(R.id.requesterUid);
+            collectorUid =  view.findViewById(R.id.collectorUid);
+            submitDate =  view.findViewById(R.id.submitDate);
+            collectDate =  view.findViewById(R.id.collectDate);
         }
     }
 
@@ -61,16 +65,18 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_DD_MM_YYYY);
+
         final WasteLocation wasteLocation = wasteLocationList.get(position);
         holder.requestId.setText(wasteLocation.getId());
-        boolean isOpen = wasteLocation.getStatus().equalsIgnoreCase("open");
-        boolean isReserve = wasteLocation.getStatus().equalsIgnoreCase("reserved");
+        boolean isOpen = wasteLocation.getStatus().equalsIgnoreCase(WASTE_LOCATION_STATUS_OPEN);
+        boolean isReserve = wasteLocation.getStatus().equalsIgnoreCase(WASTE_LOCATION_STATUS_RESERVED);
         holder.status.setText(isOpen ? "cancel" : isReserve ? "cancel" : wasteLocation.getStatus());
         holder.category.setText("Category "  + wasteLocation.getCategory());
         holder.remarks.setText("Remarks: " + wasteLocation.getRemarks());
         holder.address.setText("Address: " + wasteLocation.getAddress());
-        holder.submitDate.setText("Submit Date: " +  wasteLocation.getSubmitDate());
-        holder.reserveDate.setText("Reserve Date: " + wasteLocation.getReserveDate());
+        holder.submitDate.setText("Submit Date: " +  dateFormat.format(wasteLocation.getSubmitDate()));
+        holder.collectDate.setText("Collect Date: " + dateFormat.format(wasteLocation.getCollectDate()));
         db.collection("User").document(wasteLocation.getRequesterUid()).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
@@ -96,16 +102,16 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
             @Override
             public void onClick(View v)
             {
-                if(wasteLocation.getStatus().equalsIgnoreCase("reserved"))
+                if(wasteLocation.getStatus().equalsIgnoreCase(WASTE_LOCATION_STATUS_RESERVED))
                 {
                     wasteLocationList.remove(position);
                     notifyItemRemoved(position);
                     db.collection("WasteLocation").document(wasteLocation.getId())
-                            .update("status", "open");
+                            .update("status", WASTE_LOCATION_STATUS_OPEN);
                     db.collection("WasteLocation").document(wasteLocation.getId())
                             .update("collectorUid", null);
                 }
-                else if((wasteLocation.getStatus().equalsIgnoreCase("open")))
+                else if((wasteLocation.getStatus().equalsIgnoreCase(WASTE_LOCATION_STATUS_OPEN)))
                 {
                     wasteLocationList.remove(position);
                     notifyItemRemoved(position);

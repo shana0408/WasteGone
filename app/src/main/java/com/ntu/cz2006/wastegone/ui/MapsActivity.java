@@ -20,7 +20,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -73,6 +72,7 @@ import com.ntu.cz2006.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -118,7 +118,7 @@ public class MapsActivity extends AppCompatActivity implements
     private ImageView uploadImageButton;
     private ImageView showImage;
     private ProgressBar submitProgressBar;
-    private EditText addressInput;
+    private TextView addressInput;
 
     //Waste Location Detail BottomSheet
     private TextView titleTextView;
@@ -260,6 +260,16 @@ public class MapsActivity extends AppCompatActivity implements
             public void onClick(View v) {
                 if (submitFormBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
                     submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+                    mFusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Location> task) {
+                            mLastLocation = task.getResult();
+                            GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                            addressInput.setText(getAddressName(geoPoint));
+                        }
+                    });
+
                 } else {
                     submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
@@ -490,8 +500,6 @@ public class MapsActivity extends AppCompatActivity implements
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latlng, DEFAULT_ZOOM);
                 mMap.animateCamera(cameraUpdate);
                 myLocationButton.setColorFilter(Color.argb(255,88,150,228));
-                GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                addressInput.setText(getAddressName(geoPoint));
             }
             }
         });
@@ -540,9 +548,7 @@ public class MapsActivity extends AppCompatActivity implements
         }).addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-            //final GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-
-            final GeoPoint geoPoint = getLocationFromAddress(addressInput.getText().toString());
+            final GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
             Date submitDate = Calendar.getInstance().getTime();
 
@@ -583,50 +589,10 @@ public class MapsActivity extends AppCompatActivity implements
         return myAddress;
     }
 
-    public GeoPoint getLocationFromAddress(String strAddress) {
-
-        Geocoder coder = new Geocoder(this);
-        List<Address> address;
-        GeoPoint p1 = null;
-
-        try {
-            // May throw an IOException
-            address = coder.getFromLocationName(strAddress, 5);
-            if (address == null) {
-                return null;
-            }
-
-            Address location = address.get(0);
-            p1 = new GeoPoint(location.getLatitude(), location.getLongitude() );
-
-        } catch (IOException ex) {
-
-            ex.printStackTrace();
-        }
-
-        return p1;
-    }
-
     private String getFileExtension(Uri uri) {
         ContentResolver contentResolver = getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(contentResolver.getType(uri));
-    }
-
-    private int customMarker(String category)
-    {
-        if(category == "Paper") {
-            return R.mipmap.paper_pin_foreground;
-        }
-        else if(category == "Aluminium") {
-            return R.mipmap.aluminium_pin_foreground;
-        }
-        else if(category == "Plastic") {
-            return R.mipmap.plastic_pin_pin_foreground;
-        }
-        else {
-            return R.mipmap.aluminium_pin_foreground;
-        }
     }
 
     @Override
@@ -688,6 +654,8 @@ public class MapsActivity extends AppCompatActivity implements
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_DD_MM_YYYY);
+
         if (wasteLocationDetailBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
             final WasteLocation wasteLocation = (WasteLocation) marker.getTag();
 
@@ -695,7 +663,7 @@ public class MapsActivity extends AppCompatActivity implements
             addressTextView.setText("Address: " + wasteLocation.getAddress());
             remarksTextView.setText("Remarks: " + wasteLocation.getRemarks());
             statusTextView.setText("Status: " + wasteLocation.getStatus());
-            submitDateView.setText("Submit Date: " + wasteLocation.getSubmitDate());
+            submitDateView.setText("Submit Date: " + dateFormat.format(wasteLocation.getSubmitDate()));
 
             if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_OPEN)) {
                 reserveCollectButton.setText("Reserve");
@@ -747,16 +715,15 @@ public class MapsActivity extends AppCompatActivity implements
     private void reserveCollectRequest(View v) {
         Button button = (Button) v;
         WasteLocation wasteLocation = (WasteLocation) button.getTag();
-        Date reserveDate = Calendar.getInstance().getTime();
 
         if (button.getText().equals("Reserve")) {
             wasteLocation.setCollectorUid(firebaseUser.getUid());
             wasteLocation.setStatus(WASTE_LOCATION_STATUS_RESERVED);
-            wasteLocation.setReserveDate(reserveDate);
         }
         else if (button.getText().equals("Collect")) {
             wasteLocation.setCollectorUid(firebaseUser.getUid());
             wasteLocation.setStatus(WASTE_LOCATION_STATUS_COLLECTED);
+            wasteLocation.setCollectDate(new Date());
         }
 
         db.collection("WasteLocation").document(wasteLocation.getId()).set(wasteLocation)
