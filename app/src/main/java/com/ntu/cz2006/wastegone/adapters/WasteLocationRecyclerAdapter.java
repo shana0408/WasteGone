@@ -65,7 +65,7 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_DD_MM_YYYY);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 
         final WasteLocation wasteLocation = wasteLocationList.get(position);
         holder.requestId.setText(wasteLocation.getId());

@@ -654,7 +654,7 @@ public class MapsActivity extends AppCompatActivity implements
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_DD_MM_YYYY);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 
         if (wasteLocationDetailBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
             final WasteLocation wasteLocation = (WasteLocation) marker.getTag();

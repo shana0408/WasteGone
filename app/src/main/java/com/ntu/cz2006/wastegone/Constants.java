@@ -12,5 +12,5 @@ public class Constants {
     public static final String WASTE_LOCATION_STATUS_RESERVED = "reserved";
     public static final String WASTE_LOCATION_STATUS_COLLECTED = "collected";
 
-    public static final String DATE_FORMAT_DD_MM_YYYY = "dd-MM-yyyy";
+    public static final String DATE_FORMAT = "dd-MM-yyyy HH:mm";
 }
