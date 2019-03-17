@@ -1,10 +1,10 @@
 package com.ntu.cz2006.wastegone.ui;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Camera;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.location.Address;
@@ -20,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,6 +45,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -67,6 +69,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.ntu.cz2006.wastegone.R;
+import com.ntu.cz2006.wastegone.models.RecycleCenter;
 import com.ntu.cz2006.wastegone.models.User;
 import com.ntu.cz2006.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
@@ -81,7 +84,11 @@ import java.util.Locale;
 
 import javax.annotation.Nullable;
 
-import static com.ntu.cz2006.wastegone.Constants.*;
+import static com.ntu.cz2006.wastegone.Constants.DATE_FORMAT;
+import static com.ntu.cz2006.wastegone.Constants.REQUEST_CODE_IMAGE_OPEN;
+import static com.ntu.cz2006.wastegone.Constants.WASTE_LOCATION_STATUS_COLLECTED;
+import static com.ntu.cz2006.wastegone.Constants.WASTE_LOCATION_STATUS_OPEN;
+import static com.ntu.cz2006.wastegone.Constants.WASTE_LOCATION_STATUS_RESERVED;
 
 /**
  MapActivity class displays map , waste location and handling submit request, make
@@ -244,7 +251,8 @@ public class MapsActivity extends AppCompatActivity implements
             }
         });
 
-        showWasteOnMap();
+        subscribeWasteLocation();
+        subscribeRecycleCenter();
     }
 
     private void initButtonListener() {
@@ -304,7 +312,7 @@ public class MapsActivity extends AppCompatActivity implements
         });
     }
 
-    private void showWasteOnMap() {
+    private void subscribeWasteLocation() {
         final CollectionReference wasteLocationCollection = db.collection("WasteLocation");
 
         wasteLocationCollection
@@ -383,7 +391,7 @@ public class MapsActivity extends AppCompatActivity implements
                             }
                             break;
                         case MODIFIED:
-                            if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_OPEN)) {
+                            if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_OPEN) || (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_RESERVED) && wasteLocation.getCollectorUid().equals(firebaseUser.getUid()))) {
                                 if (existingMarker != null) {
                                     existingMarker.setPosition(latlng);
                                     existingMarker.setTitle(wasteLocation.getCategory());
@@ -471,6 +479,27 @@ public class MapsActivity extends AppCompatActivity implements
                 });
     }
 
+    private void subscribeRecycleCenter() {
+        final CollectionReference recycleCenterCollection = db.collection("RecycleCenter");
+
+        recycleCenterCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        RecycleCenter recycleCenter = document.toObject(RecycleCenter.class);
+                        recycleCenter.setId(document.getId());
+
+                        LatLng latlng = new LatLng(recycleCenter.getGeoPoint().getLatitude(), recycleCenter.getGeoPoint().getLongitude());
+
+                        Marker marker = mMap.addMarker(new MarkerOptions().position(latlng).title(recycleCenter.getName()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        marker.setTag(recycleCenter);
+                    }
+                }
+            }
+        });
+    }
+
     private void loadCategoryIntoSpinner() {
         String[] categories = new String[]{"Aluminium", "E-Waste", "Plastic", "Paper"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories) {
@@ -489,14 +518,13 @@ public class MapsActivity extends AppCompatActivity implements
         categorySpinner.setAdapter(adapter);
     }
 
-    @SuppressLint("MissingPermission")
     private void animateCameraToCurrentLocation() {
         mFusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
             @Override
             public void onComplete(@NonNull Task<Location> task) {
             if (task.isSuccessful()) {
-                Location location = task.getResult();
-                LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
+                mLastLocation = task.getResult();
+                LatLng latlng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latlng, DEFAULT_ZOOM);
                 mMap.animateCamera(cameraUpdate);
                 myLocationButton.setColorFilter(Color.argb(255,88,150,228));
@@ -515,9 +543,9 @@ public class MapsActivity extends AppCompatActivity implements
                 submitFormBottomSheet.getGlobalVisibleRect(outRect);
                 toggleSubmitBottomSheetButton.getGlobalVisibleRect(buttonRect);
 
-                if (!outRect.contains((int) event.getRawX(), (int) event.getRawY())
-                        && !buttonRect.contains((int) event.getRawX(), (int) event.getRawY()))
+                if (!outRect.contains((int) event.getRawX(), (int) event.getRawY()) && !buttonRect.contains((int) event.getRawX(), (int) event.getRawY())) {
                     submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
             }
             else if (wasteLocationDetailBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
                 Rect outRect = new Rect();
@@ -654,46 +682,54 @@ public class MapsActivity extends AppCompatActivity implements
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        if (marker.getTag() instanceof WasteLocation) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+            WasteLocation wasteLocation = (WasteLocation) marker.getTag();
 
-        if (wasteLocationDetailBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-            final WasteLocation wasteLocation = (WasteLocation) marker.getTag();
+            mFusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                @Override
+                public void onComplete(@NonNull Task<Location> task) {
+                    mLastLocation = task.getResult();
+                }
+            });
 
-            titleTextView.setText(wasteLocation.getCategory());
-            addressTextView.setText("Address: " + wasteLocation.getAddress());
-            remarksTextView.setText("Remarks: " + wasteLocation.getRemarks());
-            statusTextView.setText("Status: " + wasteLocation.getStatus());
-            submitDateView.setText("Submit Date: " + dateFormat.format(wasteLocation.getSubmitDate()));
+            if (wasteLocationDetailBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                titleTextView.setText(wasteLocation.getCategory());
+                addressTextView.setText("Address: " + wasteLocation.getAddress());
+                remarksTextView.setText("Remarks: " + wasteLocation.getRemarks());
+                statusTextView.setText("Status: " + wasteLocation.getStatus());
+                submitDateView.setText("Submit Date: " + dateFormat.format(wasteLocation.getSubmitDate()));
 
-            if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_OPEN)) {
-                reserveCollectButton.setText("Reserve");
-                reserveCollectButton.setTag(wasteLocation);
-            }
-            else if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_RESERVED) && firebaseUser.getUid().equals(wasteLocation.getCollectorUid())) {
-                reserveCollectButton.setText("Collect");
-                reserveCollectButton.setTag(wasteLocation);
+                if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_OPEN)) {
+                    reserveCollectButton.setText("Reserve");
+                    reserveCollectButton.setTag(wasteLocation);
+                }
+                else if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_RESERVED) && firebaseUser.getUid().equals(wasteLocation.getCollectorUid())) {
+                    reserveCollectButton.setText("Collect");
+                    reserveCollectButton.setTag(wasteLocation);
+                }
+                else {
+                    reserveCollectButton.setText("Collected, Closed");
+                    reserveCollectButton.setEnabled(false);
+                    reserveCollectButton.setBackgroundColor(Color.parseColor("gray"));
+                }
+
+                db.collection("User").document(wasteLocation.getRequesterUid()).get()
+                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                User user = documentSnapshot.toObject(User.class);
+                                requesterNameTextView.setText("Drop by: " + user.getName());
+                            }
+                        });
+                Picasso.get().load(wasteLocation.getImageUri()).into(wasteImageView);
+                wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
             else {
-                reserveCollectButton.setText("Collected, Closed");
-                reserveCollectButton.setEnabled(false);
-                reserveCollectButton.setBackgroundColor(Color.parseColor("gray"));
+                wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
-
-            db.collection("User").document(wasteLocation.getRequesterUid()).get()
-                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            User user = documentSnapshot.toObject(User.class);
-                            requesterNameTextView.setText("Drop by: " + user.getName());
-                        }
-                    });
-            Picasso.get().load(wasteLocation.getImageUri()).into(wasteImageView);
-
-            wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
-        else {
-            wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        }
+
         return false;
     }
 
@@ -713,26 +749,41 @@ public class MapsActivity extends AppCompatActivity implements
     }
 
     private void reserveCollectRequest(View v) {
-        Button button = (Button) v;
+        final Button button = (Button) v;
         WasteLocation wasteLocation = (WasteLocation) button.getTag();
+        button.setEnabled(false);
 
         if (button.getText().equals("Reserve")) {
             wasteLocation.setCollectorUid(firebaseUser.getUid());
             wasteLocation.setStatus(WASTE_LOCATION_STATUS_RESERVED);
         }
         else if (button.getText().equals("Collect")) {
-            wasteLocation.setCollectorUid(firebaseUser.getUid());
-            wasteLocation.setStatus(WASTE_LOCATION_STATUS_COLLECTED);
-            wasteLocation.setCollectDate(new Date());
+            Location waste = new Location("");
+            waste.setLatitude(wasteLocation.getGeo_point().getLatitude());
+            waste.setLongitude(wasteLocation.getGeo_point().getLongitude());
+
+            int distance = (int) waste.distanceTo(mLastLocation);
+
+            if (distance < 10) {
+                wasteLocation.setCollectorUid(firebaseUser.getUid());
+                wasteLocation.setStatus(WASTE_LOCATION_STATUS_COLLECTED);
+                wasteLocation.setCollectDate(new Date());
+            }
+            else {
+                Toast.makeText(this, "Please get closer, distance " + distance, Toast.LENGTH_SHORT).show();
+                button.setEnabled(true);
+                return;
+            }
         }
 
         db.collection("WasteLocation").document(wasteLocation.getId()).set(wasteLocation)
-        .addOnSuccessListener(new OnSuccessListener<Void>() {
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Toast.makeText(MapsActivity.this, "Reserved", Toast.LENGTH_SHORT).show();
                 reserveProgressBar.setVisibility(View.INVISIBLE);
                 wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                button.setEnabled(true);
             }
         });
     }
