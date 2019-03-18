@@ -72,11 +72,14 @@ public class WasteLocationRecyclerAdapter extends RecyclerView.Adapter<WasteLoca
         boolean isOpen = wasteLocation.getStatus().equalsIgnoreCase(WASTE_LOCATION_STATUS_OPEN);
         boolean isReserve = wasteLocation.getStatus().equalsIgnoreCase(WASTE_LOCATION_STATUS_RESERVED);
         holder.status.setText(isOpen ? "cancel" : isReserve ? "cancel" : wasteLocation.getStatus());
-        holder.category.setText("Category "  + wasteLocation.getCategory());
+        holder.category.setText("Category: "  + wasteLocation.getCategory());
         holder.remarks.setText("Remarks: " + wasteLocation.getRemarks());
         holder.address.setText("Address: " + wasteLocation.getAddress());
         holder.submitDate.setText("Submit Date: " +  dateFormat.format(wasteLocation.getSubmitDate()));
-        holder.collectDate.setText("Collect Date: " + dateFormat.format(wasteLocation.getCollectDate()));
+        if(wasteLocation.getCollectDate() != null)
+        {
+            holder.collectDate.setText("Collect Date: " + dateFormat.format(wasteLocation.getCollectDate()));
+        }
         db.collection("User").document(wasteLocation.getRequesterUid()).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
