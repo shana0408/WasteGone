@@ -1,10 +1,10 @@
 package com.ntu.cz2006.wastegone.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Camera;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.location.Address;
@@ -20,7 +20,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -112,6 +111,7 @@ public class MapsActivity extends AppCompatActivity implements
 
     private FloatingActionButton myLocationButton;
     private FloatingActionButton toggleSubmitBottomSheetButton;
+    private FloatingActionButton directionButton;
     private BottomSheetBehavior submitFormBottomSheetBehavior;
     private BottomSheetBehavior wasteLocationDetailBottomSheetBehavior;
     private LinearLayout submitFormBottomSheet;
@@ -174,6 +174,7 @@ public class MapsActivity extends AppCompatActivity implements
     private void findViews() {
         myLocationButton = findViewById(R.id.myLocationButton);
         toggleSubmitBottomSheetButton = findViewById(R.id.toggleBottomSheetButton);
+        directionButton = findViewById(R.id.directionButton);
         submitFormBottomSheet = findViewById(R.id.submitFormBottomSheet);
         wasteLocationDetailBottomSheet = findViewById(R.id.wasteLocationDetailBottomSheet);
         submitFormBottomSheetBehavior = BottomSheetBehavior.from(submitFormBottomSheet);
@@ -255,6 +256,7 @@ public class MapsActivity extends AppCompatActivity implements
         subscribeRecycleCenter();
     }
 
+
     private void initButtonListener() {
         myLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -264,6 +266,7 @@ public class MapsActivity extends AppCompatActivity implements
         });
 
         toggleSubmitBottomSheetButton.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("MissingPermission")
             @Override
             public void onClick(View v) {
                 if (submitFormBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
@@ -518,6 +521,7 @@ public class MapsActivity extends AppCompatActivity implements
         categorySpinner.setAdapter(adapter);
     }
 
+    @SuppressLint("MissingPermission")
     private void animateCameraToCurrentLocation() {
         mFusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
             @Override
@@ -553,6 +557,15 @@ public class MapsActivity extends AppCompatActivity implements
 
                 if (!outRect.contains((int) event.getRawX(), (int) event.getRawY())) {
                     wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+            else if (directionButton.getVisibility() == View.VISIBLE) {
+                Rect outRect = new Rect();
+                directionButton.getGlobalVisibleRect(outRect);
+
+                if (!outRect.contains((int) event.getRawX(), (int) event.getRawY())) {
+                    directionButton.hide();
+                    directionButton.setOnClickListener(null);
                 }
             }
         }
@@ -680,6 +693,7 @@ public class MapsActivity extends AppCompatActivity implements
         return false;
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public boolean onMarkerClick(Marker marker) {
         if (marker.getTag() instanceof WasteLocation) {
@@ -728,6 +742,19 @@ public class MapsActivity extends AppCompatActivity implements
             else {
                 wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
+        }
+        else if (marker.getTag() instanceof RecycleCenter) {
+            RecycleCenter recycleCenter = (RecycleCenter) marker.getTag();
+            final GeoPoint geoPoint = recycleCenter.getGeoPoint();
+            directionButton.show();
+            directionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                        Uri.parse("http://maps.google.com/maps?daddr=" + geoPoint.getLatitude() + "," + geoPoint.getLongitude()));
+                    startActivity(intent);
+                }
+            });
         }
 
         return false;
