@@ -57,6 +57,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -106,6 +107,8 @@ public class MapsActivity extends AppCompatActivity implements
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private FirebaseUser firebaseUser;
+    private DocumentReference dbUser;
+    private User localUser;
     private GoogleMap mMap;
     private Location mLastLocation;
 
@@ -210,14 +213,27 @@ public class MapsActivity extends AppCompatActivity implements
     }
 
     private void loadUserIntoNavigation() {
-        db.collection("User").document(firebaseUser.getUid())
-                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        dbUser = db.collection("User").document(firebaseUser.getUid());
+
+        dbUser.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                User user = documentSnapshot.toObject(User.class);
-                userRewardsTextView.setText("Rewards: " + user.getRewards());
+                localUser = documentSnapshot.toObject(User.class);
+                userRewardsTextView.setText("Rewards: " + localUser.getRewards());
             }
         });
+
+        dbUser.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    return;
+                }
+                localUser = documentSnapshot.toObject(User.class);
+                userRewardsTextView.setText("Rewards: " + localUser.getRewards());
+            }
+        });
+
         userNameTextView.setText(firebaseUser.getDisplayName());
         userEmailTextView.setText(firebaseUser.getEmail());
         Picasso.get().load(firebaseUser.getPhotoUrl()).into(userProfileImageView);
@@ -606,6 +622,9 @@ public class MapsActivity extends AppCompatActivity implements
                         Toast.makeText(MapsActivity.this, "WasteLocation added", Toast.LENGTH_SHORT).show();
                         submitProgressBar.setVisibility(View.INVISIBLE);
                         submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+                        localUser.setRewards(localUser.getRewards() + 25);
+                        dbUser.set(localUser);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -813,6 +832,9 @@ public class MapsActivity extends AppCompatActivity implements
                 reserveProgressBar.setVisibility(View.INVISIBLE);
                 wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 button.setEnabled(true);
+
+                localUser.setRewards(localUser.getRewards() + 50);
+                dbUser.set(localUser);
             }
         });
     }
