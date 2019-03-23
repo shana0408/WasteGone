@@ -14,57 +14,126 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:weightSum="10">
+
     <TextView
-        android:id="@+id/titleTextView"
+        android:id="@+id/recycle_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
+        android:text="Recycle Detail"
         android:textColor="#000"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         android:textAlignment="center"/>
 
     <TextView
+        android:id="@+id/titleText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:text=" Category"
+        android:textColor="#9E9E9E"
+        android:textSize="13sp"
+        android:layout_below="@+id/wasteImageView"
+        />
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/titleText"/>
+
+    <TextView
+        android:id="@+id/addressText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:text=" Address"
+        android:textColor="#9E9E9E"
+        android:textSize="13sp"
+        android:layout_below="@+id/titleTextView"
+        />
+    <TextView
         android:id="@+id/addressTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/wasteImageView"
+        android:layout_below="@id/addressText"
         android:layout_weight="3"/>
 
+    <TextView
+        android:id="@+id/remarksText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:text=" Remarks"
+        android:textColor="#9E9E9E"
+        android:textSize="13sp"
+        android:layout_below="@+id/addressTextView"
+        />
     <TextView
         android:id="@+id/remarksTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/addressTextView"
+        android:layout_below="@id/remarksText"
         android:layout_weight="3"/>
 
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:text=" Status"
+        android:textColor="#9E9E9E"
+        android:textSize="13sp"
+        android:layout_below="@+id/remarksTextView"
+        />
     <TextView
         android:id="@+id/statusTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/remarksTextView"
+        android:layout_below="@id/statusText"
         android:layout_weight="3"/>
 
+    <TextView
+        android:id="@+id/requesterName"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:text=" Requeter"
+        android:textColor="#9E9E9E"
+        android:textSize="13sp"
+        android:layout_below="@+id/statusTextView"
+        />
     <TextView
         android:id="@+id/requesterNameTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/statusTextView"
+        android:layout_below="@id/requesterName"
         android:layout_weight="3"/>
 
+    <TextView
+        android:id="@+id/submitDateText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:text="SubmitDate"
+        android:textColor="#9E9E9E"
+        android:textSize="13sp"
+        android:layout_below="@+id/requesterNameTextView"
+        />
     <TextView
         android:id="@+id/submitDateView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/requesterNameTextView"
+        android:layout_below="@id/submitDateText"
         android:layout_weight="3"/>
 
     <ImageView
         android:id="@+id/wasteImageView"
         android:layout_width="wrap_content"
-        android:layout_height="160dp"
-        android:layout_below="@id/titleTextView"
-        android:layout_centerHorizontal="true"
+        android:layout_height="100dp"
+        android:layout_below="@id/recycle_detail"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="10dip"
         android:layout_weight="7" />
 
     <Button
@@ -75,7 +144,7 @@
         android:text="Button"
         android:background="#000"
         android:textColor="#fff"
-        android:layout_below="@id/requesterNameTextView"/>
+        android:layout_below="@id/submitDateView"/>
 
     <ProgressBar
         android:id="@+id/reserveRequestProgressBar"

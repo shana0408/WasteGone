@@ -532,6 +532,8 @@ public class MapsActivity extends AppCompatActivity implements
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latlng, DEFAULT_ZOOM);
                 mMap.animateCamera(cameraUpdate);
                 myLocationButton.setColorFilter(Color.argb(255,88,150,228));
+                GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                addressInput.setText(getAddressName(geoPoint));
             }
             }
         });
@@ -709,10 +711,10 @@ public class MapsActivity extends AppCompatActivity implements
 
             if (wasteLocationDetailBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
                 titleTextView.setText(wasteLocation.getCategory());
-                addressTextView.setText("Address: " + wasteLocation.getAddress());
-                remarksTextView.setText("Remarks: " + wasteLocation.getRemarks());
-                statusTextView.setText("Status: " + wasteLocation.getStatus());
-                submitDateView.setText("Submit Date: " + dateFormat.format(wasteLocation.getSubmitDate()));
+                addressTextView.setText(wasteLocation.getAddress());
+                remarksTextView.setText(wasteLocation.getRemarks());
+                statusTextView.setText(wasteLocation.getStatus());
+                submitDateView.setText(dateFormat.format(wasteLocation.getSubmitDate()));
 
                 if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_OPEN)) {
                     reserveCollectButton.setText("Reserve");
@@ -733,7 +735,7 @@ public class MapsActivity extends AppCompatActivity implements
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
                                 User user = documentSnapshot.toObject(User.class);
-                                requesterNameTextView.setText("Drop by: " + user.getName());
+                                requesterNameTextView.setText(user.getName());
                             }
                         });
                 Picasso.get().load(wasteLocation.getImageUri()).into(wasteImageView);

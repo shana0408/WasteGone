@@ -23,71 +23,146 @@
                 android:layout_height="wrap_content"
                 android:visibility="invisible"/>
 
+            <TextView
+                android:id="@+id/geopointsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Address"
+                android:textColor="#9E9E9E"
+                android:layout_toRightOf="@id/waste_image"
+                android:layout_toLeftOf="@+id/status"
+                />
         <TextView
             android:id="@+id/geopoints"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/geopointsText"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/waste_image"
             android:layout_toLeftOf="@+id/status" />
 
+
+            <TextView
+                android:id="@+id/categoryText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/geopoints"
+                android:layout_marginTop="5dip"
+                android:text="Category"
+                android:textColor="#9E9E9E"
+                android:layout_toRightOf="@id/waste_image"
+                android:layout_toLeftOf="@+id/status"
+                />
         <TextView
             android:id="@+id/category"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/geopoints"
+            android:layout_below="@+id/categoryText"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/waste_image"
             android:layout_toLeftOf="@+id/status"/>
 
+            <TextView
+                android:id="@+id/remarksText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/category"
+                android:layout_marginTop="5dip"
+                android:text="Remarks"
+                android:textColor="#9E9E9E"
+                android:layout_toRightOf="@id/waste_image"
+                android:layout_toLeftOf="@+id/status"
+                />
         <TextView
             android:id="@+id/remarks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/category"
+            android:layout_below="@+id/remarksText"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/waste_image"
             android:layout_toLeftOf="@+id/status" />
 
-
+            <TextView
+                android:id="@+id/submitDateText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/remarks"
+                android:layout_marginTop="5dip"
+                android:text="SubmitDate"
+                android:textColor="#9E9E9E"
+                android:layout_toRightOf="@id/waste_image"
+                android:layout_toLeftOf="@+id/status"
+                />
             <TextView
                 android:id="@+id/submitDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/remarks"
+                android:layout_below="@+id/submitDateText"
                 android:layout_marginLeft="5dp"
                 android:layout_toRightOf="@id/waste_image"
                 android:layout_toLeftOf="@+id/status" />
 
-
+            <TextView
+                android:id="@+id/requesterUidText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/submitDate"
+                android:layout_marginTop="5dip"
+                android:text="Rquester"
+                android:textColor="#9E9E9E"
+                android:layout_toRightOf="@id/waste_image"
+                android:layout_toLeftOf="@+id/status"
+                />
             <TextView
                 android:id="@+id/requesterUid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/submitDate"
+                android:layout_below="@+id/requesterUidText"
                 android:layout_marginLeft="5dp"
                 android:layout_toRightOf="@id/waste_image"
                 android:layout_toLeftOf="@+id/status" />
 
+    <!--        <TextView
+                android:id="@+id/collectorUidText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/requesterUid"
+                android:layout_marginTop="5dip"
+                android:text="Collector"
+                android:textColor="#9E9E9E"
+                android:layout_toRightOf="@id/waste_image"
+                android:layout_toLeftOf="@+id/status"
+                />
             <TextView
                 android:id="@+id/collectorUid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/requesterUid"
+                android:layout_below="@+id/collectorUidText"
                 android:layout_marginLeft="5dp"
                 android:layout_toRightOf="@id/waste_image"
                 android:layout_toLeftOf="@+id/status" />
 
 
             <TextView
-                android:id="@+id/collectDate"
+                android:id="@+id/collectDateText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/collectorUid"
+                android:layout_marginTop="5dip"
+                android:text="Collector"
+                android:textColor="#9E9E9E"
+                android:layout_toRightOf="@id/waste_image"
+                android:layout_toLeftOf="@+id/status"
+                />
+            <TextView
+                android:id="@+id/collectDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/collectDateText"
                 android:layout_marginLeft="5dp"
                 android:layout_toRightOf="@id/waste_image"
                 android:layout_toLeftOf="@+id/status" />
-
+-->
 
             <Button
                 android:id="@+id/status"
@@ -102,7 +177,7 @@
             android:id="@+id/waste_image"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:layout_centerVertical="true"
+
             android:src="@mipmap/wastegone_icon_round" />
 
 

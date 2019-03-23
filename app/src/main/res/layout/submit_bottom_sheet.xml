@@ -18,18 +18,31 @@
         android:layout_marginBottom="20dp"
         android:text="Drop a request"
         android:textColor="#000"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold"
             android:textAlignment="center"/>
 
-        <Spinner
-            android:id="@+id/categorySpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
-
-
     <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:text=" Category"
+        android:textColor="#9E9E9E"
+        android:layout_marginBottom="5dp"
+        android:textSize="13sp"
+        />
+    <Spinner
+        android:id="@+id/categorySpinner"
+        android:layout_width="fill_parent"
+        android:layout_height="57dp"
+        android:textSize="28sp" />
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/addressInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <EditText
         android:id="@+id/addressInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,16 +50,18 @@
         android:hint="Enter Address"
         android:inputType="text" />
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/remarksInputLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    </android.support.design.widget.TextInputLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:weightSum="10">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/remarksInputLayout"
+                android:layout_width="329dp"
+                android:layout_height="wrap_content">
 
             <EditText
                 android:id="@+id/remarksInput"
@@ -56,20 +71,17 @@
                 android:layout_toLeftOf="@id/uploadImageButton"
                 android:hint="Remarks"
                 android:inputType="text" />
-
+            </android.support.design.widget.TextInputLayout>
 
             <ImageView
                 android:id="@+id/uploadImageButton"
                 android:layout_width="60dp"
-                android:layout_height="37dp"
+                android:layout_height="50dp"
                 android:layout_toRightOf="@id/remarksInput"
                 android:layout_weight="4"
                 android:src="@drawable/ic_addimage" />
-
-
-
         </LinearLayout>
-    </android.support.design.widget.TextInputLayout>
+
 
     <RelativeLayout
         android:layout_width="match_parent"
