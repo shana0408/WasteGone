@@ -128,17 +128,16 @@ public class MapsActivity extends AppCompatActivity implements
     private ImageView uploadImageButton;
     private ImageView showImage;
     private ProgressBar submitProgressBar;
-    private TextView addressInput;
+    private TextView submitAddressTextView;
 
     //Waste Location Detail BottomSheet
     private TextView titleTextView;
     private TextView remarksTextView;
-    private TextView statusTextView;
     private TextView requesterNameTextView;
     private ImageView wasteImageView;
     private Button reserveCollectButton;
     private ProgressBar reserveProgressBar;
-    private TextView addressTextView;
+    private TextView detailAddressTextView;
     private TextView submitDateView;
 
     //Navigation Drawer
@@ -189,16 +188,15 @@ public class MapsActivity extends AppCompatActivity implements
         uploadImageButton = submitFormBottomSheet.findViewById(R.id.uploadImageButton);
         showImage = submitFormBottomSheet.findViewById(R.id.showImage);
         submitProgressBar = submitFormBottomSheet.findViewById(R.id.submitRequestProgressBar);
-        addressInput = submitFormBottomSheet.findViewById(R.id.addressInput);
+        submitAddressTextView = submitFormBottomSheet.findViewById(R.id.addressTextView);
 
         titleTextView = wasteLocationDetailBottomSheet.findViewById(R.id.titleTextView);
         remarksTextView = wasteLocationDetailBottomSheet.findViewById(R.id.remarksTextView);
-        statusTextView = wasteLocationDetailBottomSheet.findViewById(R.id.statusTextView);
         requesterNameTextView = wasteLocationDetailBottomSheet.findViewById(R.id.requesterNameTextView);
         wasteImageView = wasteLocationDetailBottomSheet.findViewById(R.id.wasteImageView);
         reserveCollectButton = wasteLocationDetailBottomSheet.findViewById(R.id.reserveCollectButton);
         reserveProgressBar = wasteLocationDetailBottomSheet.findViewById(R.id.reserveRequestProgressBar);
-        addressTextView = wasteLocationDetailBottomSheet.findViewById(R.id.addressTextView);
+        detailAddressTextView = wasteLocationDetailBottomSheet.findViewById(R.id.addressTextView);
         submitDateView = wasteLocationDetailBottomSheet.findViewById(R.id.submitDateView);
 
         navigationView = findViewById(R.id.nav_view);
@@ -263,7 +261,6 @@ public class MapsActivity extends AppCompatActivity implements
                     CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latlng, DEFAULT_ZOOM);
                     GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                     mMap.moveCamera(cameraUpdate);
-                    addressInput.setText(getAddressName(geoPoint));
                 }
             }
         });
@@ -293,7 +290,7 @@ public class MapsActivity extends AppCompatActivity implements
                         public void onComplete(@NonNull Task<Location> task) {
                             mLastLocation = task.getResult();
                             GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                            addressInput.setText(getAddressName(geoPoint));
+                            submitAddressTextView.setText(getAddressName(geoPoint));
                         }
                     });
 
@@ -306,8 +303,10 @@ public class MapsActivity extends AppCompatActivity implements
         submitRequestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submitProgressBar.bringToFront();
+                submitRequestButton.setEnabled(false);
                 submitProgressBar.setVisibility(View.VISIBLE);
+                submitProgressBar.bringToFront();
+                submitRequestButton.setText("");
                 submitWasteRequest();
             }
         });
@@ -324,8 +323,10 @@ public class MapsActivity extends AppCompatActivity implements
         reserveCollectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                reserveProgressBar.bringToFront();
+                reserveCollectButton.setEnabled(false);
                 reserveProgressBar.setVisibility(View.VISIBLE);
+                reserveProgressBar.bringToFront();
+                reserveCollectButton.setText("");
                 reserveCollectRequest(v);
             }
         });
@@ -548,12 +549,9 @@ public class MapsActivity extends AppCompatActivity implements
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latlng, DEFAULT_ZOOM);
                 mMap.animateCamera(cameraUpdate);
                 myLocationButton.setColorFilter(Color.argb(255,88,150,228));
-                GeoPoint geoPoint = new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                addressInput.setText(getAddressName(geoPoint));
             }
             }
         });
-
     }
 
     @Override
@@ -592,6 +590,11 @@ public class MapsActivity extends AppCompatActivity implements
     }
 
     private void submitWasteRequest() {
+        if (selectedImage == null) {
+            Toast.makeText(this, "Please select photo", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         final StorageReference fileReference = mStorageRef.child("images/" + System.currentTimeMillis() + "." + getFileExtension(selectedImage));
         UploadTask uploadTask = fileReference.putFile(selectedImage);
 
@@ -613,25 +616,32 @@ public class MapsActivity extends AppCompatActivity implements
 
             WasteLocation wasteLocation = new WasteLocation(firebaseUser.getUid(), null, geoPoint,
                 categorySpinner.getSelectedItem().toString(), remarksInput.getText().toString(),
-                uri.toString(), WASTE_LOCATION_STATUS_OPEN, addressInput.getText().toString(), submitDate, null);
+                uri.toString(), WASTE_LOCATION_STATUS_OPEN, submitAddressTextView.getText().toString(), submitDate, null);
 
             db.collection("WasteLocation").document().set(wasteLocation)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(MapsActivity.this, "WasteLocation added", Toast.LENGTH_SHORT).show();
-                        submitProgressBar.setVisibility(View.INVISIBLE);
                         submitFormBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-                        localUser.setRewards(localUser.getRewards() + 25);
-                        dbUser.set(localUser);
+                        submitProgressBar.setVisibility(View.INVISIBLE);
+                        submitRequestButton.setEnabled(true);
+                        submitRequestButton.setText("SUBMIT REQUEST");
+
+                        remarksInput.setText("");
+                        selectedImage = null;
+                        showImage.setImageResource(0);
+                        userGetRewards(25);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        submitProgressBar.setVisibility(View.INVISIBLE);
                         Toast.makeText(MapsActivity.this, "Unable to add", Toast.LENGTH_SHORT).show();
+                        submitProgressBar.setVisibility(View.INVISIBLE);
+                        submitRequestButton.setEnabled(true);
+                        submitRequestButton.setText("SUBMIT REQUEST");
                     }
                 });
             }
@@ -730,9 +740,8 @@ public class MapsActivity extends AppCompatActivity implements
 
             if (wasteLocationDetailBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
                 titleTextView.setText(wasteLocation.getCategory());
-                addressTextView.setText(wasteLocation.getAddress());
+                detailAddressTextView.setText(wasteLocation.getAddress());
                 remarksTextView.setText(wasteLocation.getRemarks());
-                statusTextView.setText(wasteLocation.getStatus());
                 submitDateView.setText(dateFormat.format(wasteLocation.getSubmitDate()));
 
                 if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_OPEN)) {
@@ -801,11 +810,11 @@ public class MapsActivity extends AppCompatActivity implements
         WasteLocation wasteLocation = (WasteLocation) button.getTag();
         button.setEnabled(false);
 
-        if (button.getText().equals("Reserve")) {
+        if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_OPEN)) {
             wasteLocation.setCollectorUid(firebaseUser.getUid());
             wasteLocation.setStatus(WASTE_LOCATION_STATUS_RESERVED);
         }
-        else if (button.getText().equals("Collect")) {
+        else if (wasteLocation.getStatus().equals(WASTE_LOCATION_STATUS_RESERVED)) {
             Location waste = new Location("");
             waste.setLatitude(wasteLocation.getGeo_point().getLatitude());
             waste.setLongitude(wasteLocation.getGeo_point().getLongitude());
@@ -828,7 +837,6 @@ public class MapsActivity extends AppCompatActivity implements
             .addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(MapsActivity.this, "Reserved", Toast.LENGTH_SHORT).show();
                 reserveProgressBar.setVisibility(View.INVISIBLE);
                 wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 button.setEnabled(true);
@@ -838,4 +846,10 @@ public class MapsActivity extends AppCompatActivity implements
             }
         });
     }
+
+    private void userGetRewards(int point) {
+        localUser.setRewards(localUser.getRewards() + point);
+        dbUser.set(localUser);
+    }
 }
+

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/submitFormBottomSheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -15,105 +14,96 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="30dp"
         android:text="Drop a request"
         android:textColor="#000"
-        android:textSize="20sp"
+        android:textSize="20dp"
         android:textStyle="bold"
-            android:textAlignment="center"/>
+        android:textAlignment="center" />
 
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
         android:text=" Category"
         android:textColor="#9E9E9E"
         android:layout_marginBottom="5dp"
-        android:textSize="13sp"
-        />
+        android:textSize="13dp" />
+
     <Spinner
         android:id="@+id/categorySpinner"
         android:layout_width="fill_parent"
-        android:layout_height="57dp"
-        android:textSize="28sp" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/addressInputLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    <EditText
-        android:id="@+id/addressInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:hint="Enter Address"
-        android:inputType="text" />
-
+        android:layout_marginBottom="16dp">
+        <EditText
+            android:id="@+id/addressTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Address"
+            android:inputType="text"
+            android:focusable="false" />
     </android.support.design.widget.TextInputLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:weightSum="10">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal"
+        android:weightSum="10">
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/remarksInputLayout"
-                android:layout_width="329dp"
-                android:layout_height="wrap_content">
-
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="9">
             <EditText
                 android:id="@+id/remarksInput"
-                android:layout_width="329dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:layout_toLeftOf="@id/uploadImageButton"
                 android:hint="Remarks"
                 android:inputType="text" />
-            </android.support.design.widget.TextInputLayout>
+        </android.support.design.widget.TextInputLayout>
 
-            <ImageView
-                android:id="@+id/uploadImageButton"
-                android:layout_width="60dp"
-                android:layout_height="50dp"
-                android:layout_toRightOf="@id/remarksInput"
-                android:layout_weight="4"
-                android:src="@drawable/ic_addimage" />
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/uploadImageButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_addimage" />
+    </LinearLayout>
 
+    <ImageView
+        android:id="@+id/showImage"
+        android:layout_width="match_parent"
+        android:layout_height="100dp" />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:orientation="horizontal"
-        android:weightSum="10">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp">
+        <Button
+            android:id="@+id/submitRequestButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SUBMIT REQUEST"
+            android:foreground="?attr/selectableItemBackground"
+            android:background="#000"
+            android:textColor="#fff"/>
 
         <ProgressBar
             android:id="@+id/submitRequestProgressBar"
             style="?android:attr/progressBarStyle"
-            android:layout_width="124dp"
-            android:layout_height="117dp"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
             android:layout_centerInParent="true"
-            android:layout_weight="4"
             android:layout_gravity="top"
-            android:visibility="invisible"/>
-
-        <ImageView
-            android:id="@+id/showImage"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="4" />
-    </RelativeLayout >
-
-    <Button
-        android:id="@+id/submitRequestButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="SUBMIT REQUEST"
-        android:foreground="?attr/selectableItemBackground"
-        android:background="#000"
-        android:textColor="#fff"/>
+            android:visibility="invisible"
+            android:indeterminate="true"
+            android:indeterminateTint="#fff"
+            android:indeterminateTintMode="src_in"/>
+    </RelativeLayout>
 
 </LinearLayout>

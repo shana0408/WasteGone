@@ -10,151 +10,119 @@
     app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:weightSum="10">
 
     <TextView
         android:id="@+id/recycle_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="30dp"
         android:text="Recycle Detail"
         android:textColor="#000"
-        android:textSize="20sp"
+        android:textSize="20dp"
         android:textStyle="bold"
         android:textAlignment="center"/>
 
-    <TextView
-        android:id="@+id/titleText"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        android:text=" Category"
-        android:textColor="#9E9E9E"
-        android:textSize="13sp"
-        android:layout_below="@+id/wasteImageView"
-        />
-    <TextView
-        android:id="@+id/titleTextView"
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/titleText"/>
+        android:layout_marginBottom="10dp">
+        <EditText
+            android:id="@+id/titleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Category"
+            android:inputType="text"
+            android:focusable="false" />
+    </android.support.design.widget.TextInputLayout>
 
-    <TextView
-        android:id="@+id/addressText"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        android:text=" Address"
-        android:textColor="#9E9E9E"
-        android:textSize="13sp"
-        android:layout_below="@+id/titleTextView"
-        />
-    <TextView
-        android:id="@+id/addressTextView"
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/addressText"
-        android:layout_weight="3"/>
+        android:layout_marginBottom="10dp">
+        <EditText
+            android:id="@+id/addressTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Address"
+            android:inputType="text"
+            android:focusable="false" />
+    </android.support.design.widget.TextInputLayout>
 
-    <TextView
-        android:id="@+id/remarksText"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        android:text=" Remarks"
-        android:textColor="#9E9E9E"
-        android:textSize="13sp"
-        android:layout_below="@+id/addressTextView"
-        />
-    <TextView
-        android:id="@+id/remarksTextView"
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/remarksText"
-        android:layout_weight="3"/>
+        android:layout_marginBottom="10dp">
+        <EditText
+            android:id="@+id/remarksTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Remarks"
+            android:inputType="text"
+            android:focusable="false" />
+    </android.support.design.widget.TextInputLayout>
 
-    <TextView
-        android:id="@+id/statusText"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        android:text=" Status"
-        android:textColor="#9E9E9E"
-        android:textSize="13sp"
-        android:layout_below="@+id/remarksTextView"
-        />
-    <TextView
-        android:id="@+id/statusTextView"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/statusText"
-        android:layout_weight="3"/>
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal"
+        android:weightSum="10">
 
-    <TextView
-        android:id="@+id/requesterName"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        android:text=" Requeter"
-        android:textColor="#9E9E9E"
-        android:textSize="13sp"
-        android:layout_below="@+id/statusTextView"
-        />
-    <TextView
-        android:id="@+id/requesterNameTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/requesterName"
-        android:layout_weight="3"/>
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5">
+            <EditText
+                android:id="@+id/requesterNameTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Drop By"
+                android:inputType="text"
+                android:focusable="false" />
+        </android.support.design.widget.TextInputLayout>
 
-    <TextView
-        android:id="@+id/submitDateText"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        android:text="SubmitDate"
-        android:textColor="#9E9E9E"
-        android:textSize="13sp"
-        android:layout_below="@+id/requesterNameTextView"
-        />
-    <TextView
-        android:id="@+id/submitDateView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/submitDateText"
-        android:layout_weight="3"/>
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5">
+            <EditText
+                android:id="@+id/submitDateView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Created On"
+                android:inputType="text"
+                android:focusable="false" />
+        </android.support.design.widget.TextInputLayout>
+
+    </LinearLayout>
+
 
     <ImageView
         android:id="@+id/wasteImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="100dp"
-        android:layout_below="@id/recycle_detail"
-        android:layout_alignParentLeft="true"
-        android:layout_marginTop="10dip"
-        android:layout_weight="7" />
+        android:layout_width="match_parent"
+        android:layout_height="100dp" />
 
-    <Button
-        android:id="@+id/reserveCollectButton"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="Button"
-        android:background="#000"
-        android:textColor="#fff"
-        android:layout_below="@id/submitDateView"/>
-
-    <ProgressBar
-        android:id="@+id/reserveRequestProgressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="124dp"
-        android:layout_height="117dp"
-        android:layout_centerInParent="true"
-        android:layout_weight="4"
-        android:layout_gravity="top"
-        android:visibility="invisible"/>
-</RelativeLayout>
-
+        android:layout_marginTop="30dp">
+        <Button
+            android:id="@+id/reserveCollectButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Button"
+            android:background="#000"
+            android:textColor="#fff" />
+        <ProgressBar
+            android:id="@+id/reserveRequestProgressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_centerInParent="true"
+            android:layout_gravity="top"
+            android:visibility="invisible"
+            android:indeterminate="true"
+            android:indeterminateTint="#fff"
+            android:indeterminateTintMode="src_in"/>
+    </RelativeLayout>
 </LinearLayout>
