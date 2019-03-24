@@ -37,7 +37,7 @@
                 android:layout_marginBottom="16dp"
                 android:src="@drawable/ic_direction"
                 android:visibility="gone"
-                app:backgroundTint="#0000FF" />
+                app:backgroundTint="#3A78E7" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/myLocationButton"
