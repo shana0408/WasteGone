@@ -20,6 +20,7 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/floatingActionButtonLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|end"
@@ -60,9 +61,9 @@
                 app:backgroundTint="#FFF" />
         </LinearLayout>
 
+
         <include layout="@layout/submit_bottom_sheet" />
         <include layout="@layout/marker_detail_bottom_sheet" />
-
     </android.support.design.widget.CoordinatorLayout>
 
 

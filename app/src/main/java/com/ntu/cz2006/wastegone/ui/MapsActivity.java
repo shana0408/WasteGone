@@ -171,6 +171,36 @@ public class MapsActivity extends AppCompatActivity implements
         initButtonListener();
         loadCategoryIntoSpinner();
         loadUserIntoNavigation();
+
+        wasteLocationDetailBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View view, int i) {
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View view, float slideOffset) {
+                GeoPoint geoPoint = (GeoPoint) wasteLocationDetailBottomSheet.getTag();
+                LatLng latlng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+
+                switch (wasteLocationDetailBottomSheetBehavior.getState()) {
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        setMapPaddingBotttom(slideOffset * wasteLocationDetailBottomSheet.getHeight());
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        setMapPaddingBotttom(slideOffset * wasteLocationDetailBottomSheet.getHeight());
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+                        break;
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        break;
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        break;
+                }
+            }
+        });
     }
 
     private void findViews() {
@@ -768,6 +798,7 @@ public class MapsActivity extends AppCompatActivity implements
                         });
                 Picasso.get().load(wasteLocation.getImageUri()).into(wasteImageView);
                 wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                wasteLocationDetailBottomSheet.setTag(wasteLocation.getGeo_point());
             }
             else {
                 wasteLocationDetailBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -850,6 +881,10 @@ public class MapsActivity extends AppCompatActivity implements
     private void userGetRewards(int point) {
         localUser.setRewards(localUser.getRewards() + point);
         dbUser.set(localUser);
+    }
+
+    private void setMapPaddingBotttom(Float offset) {
+        mMap.setPadding(0, 0, 0, Math.round(offset));
     }
 }
 

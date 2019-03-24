@@ -27,7 +27,7 @@
         android:text=" Category"
         android:textColor="#9E9E9E"
         android:layout_marginBottom="5dp"
-        android:textSize="13dp" />
+        android:textSize="12dp" />
 
     <Spinner
         android:id="@+id/categorySpinner"
@@ -38,7 +38,7 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="10dp">
         <EditText
             android:id="@+id/addressTextView"
             android:layout_width="match_parent"
