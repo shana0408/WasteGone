@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.ntu.cz2006.wastegone.R;
+import com.ntu.wastegone.R;
 
 /**
  WelcomeActivity class show welcome page to user
