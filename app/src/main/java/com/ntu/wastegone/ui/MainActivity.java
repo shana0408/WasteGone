@@ -1,4 +1,4 @@
-package com.ntu.cz2006.wastegone.ui;
+package com.ntu.wastegone.ui;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void navigateMap() {
-        Intent intent = new Intent(this, MapsActivity.class);
+        Intent intent = new Intent(this, com.ntu.cz2006.wastegone.ui.MapsActivity.class);
         startActivity(intent);
         finish();
     }

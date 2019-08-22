@@ -1,4 +1,4 @@
-package com.ntu.cz2006.wastegone.models;
+package com.ntu.wastegone.models;
 
 import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.GeoPoint;

@@ -1,4 +1,4 @@
-package com.ntu.cz2006.wastegone.ui;
+package com.ntu.wastegone.ui;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -68,10 +68,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.ntu.cz2006.wastegone.R;
-import com.ntu.cz2006.wastegone.models.RecycleCenter;
-import com.ntu.cz2006.wastegone.models.User;
-import com.ntu.cz2006.wastegone.models.WasteLocation;
+import com.ntu.wastegone.R;
+import com.ntu.wastegone.models.RecycleCenter;
+import com.ntu.wastegone.models.User;
+import com.ntu.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -84,11 +84,11 @@ import java.util.Locale;
 
 import javax.annotation.Nullable;
 
-import static com.ntu.cz2006.wastegone.Constants.DATE_FORMAT;
-import static com.ntu.cz2006.wastegone.Constants.REQUEST_CODE_IMAGE_OPEN;
-import static com.ntu.cz2006.wastegone.Constants.WASTE_LOCATION_STATUS_COLLECTED;
-import static com.ntu.cz2006.wastegone.Constants.WASTE_LOCATION_STATUS_OPEN;
-import static com.ntu.cz2006.wastegone.Constants.WASTE_LOCATION_STATUS_RESERVED;
+import static com.ntu.wastegone.Constants.DATE_FORMAT;
+import static com.ntu.wastegone.Constants.REQUEST_CODE_IMAGE_OPEN;
+import static com.ntu.wastegone.Constants.WASTE_LOCATION_STATUS_COLLECTED;
+import static com.ntu.wastegone.Constants.WASTE_LOCATION_STATUS_OPEN;
+import static com.ntu.wastegone.Constants.WASTE_LOCATION_STATUS_RESERVED;
 
 /**
  MapActivity class displays map , waste location and handling submit request, make
@@ -735,12 +735,12 @@ public class MapsActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         if (id == R.id.nav_request) {
-            Intent i = new Intent(getApplicationContext(),RequestActivity.class);
+            Intent i = new Intent(getApplicationContext(), com.ntu.wastegone.ui.RequestActivity.class);
             i.putExtra("FROM_ACTIVITY", "MapsActivity");
             startActivity(i);
         }
         else if (id == R.id.nav_reservation) {
-            Intent i = new Intent(getApplicationContext(),ReservationActivity.class);
+            Intent i = new Intent(getApplicationContext(), com.ntu.wastegone.ui.ReservationActivity.class);
             i.putExtra("FROM_ACTIVITY", "MapsActivity");
             startActivity(i);
         }

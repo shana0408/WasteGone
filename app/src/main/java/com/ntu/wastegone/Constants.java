@@ -1,4 +1,4 @@
-package com.ntu.cz2006.wastegone;
+package com.ntu.wastegone;
 
 public class Constants {
     public static final int ERROR_DIALOG_REQUEST = 9001;

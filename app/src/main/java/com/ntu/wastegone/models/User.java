@@ -1,4 +1,4 @@
-package com.ntu.cz2006.wastegone.models;
+package com.ntu.wastegone.models;
 
 /**
  User class store user's information

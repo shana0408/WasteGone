@@ -1,4 +1,4 @@
-package com.ntu.cz2006.wastegone.adapters;
+package com.ntu.wastegone.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,15 +10,15 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.ntu.cz2006.wastegone.R;
-import com.ntu.cz2006.wastegone.models.User;
-import com.ntu.cz2006.wastegone.models.WasteLocation;
+import com.ntu.wastegone.R;
+import com.ntu.wastegone.models.User;
+import com.ntu.wastegone.models.WasteLocation;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import static com.ntu.cz2006.wastegone.Constants.*;
+import static com.ntu.wastegone.Constants.*;
 
 /**
  An adapter to generate recycleview for wastelocation

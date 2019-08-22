@@ -1,4 +1,4 @@
-package com.ntu.cz2006.wastegone.ui;
+package com.ntu.wastegone.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,13 +25,12 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
-import com.ntu.cz2006.wastegone.R;
+import com.ntu.cz3002.wastegone.R;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.ntu.cz2006.wastegone.Constants.REQUEST_CODE_SIGN_IN;
+import static com.ntu.wastegone.Constants.REQUEST_CODE_SIGN_IN;
 
 /**
  LoginActivity class handles user login
@@ -116,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        Intent i = new Intent(getApplicationContext(),MainActivity.class);
+                        Intent i = new Intent(getApplicationContext(), com.ntu.cz2006.wastegone.ui.MainActivity.class);
                         startActivity(i);
                         finish();
                         Toast.makeText(getApplicationContext(), "User exist", Toast.LENGTH_SHORT).show();
@@ -132,7 +131,7 @@ public class LoginActivity extends AppCompatActivity {
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        Intent i = new Intent(getApplicationContext(),MainActivity.class);
+                                        Intent i = new Intent(getApplicationContext(), com.ntu.wastegone.ui.MainActivity.class);
                                         startActivity(i);
                                         finish();
                                         Toast.makeText(getApplicationContext(), "User added", Toast.LENGTH_SHORT).show();
