@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "907404957778-qhm1b5bdoko4cu2cq7lphgubade0937s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ntu.wastegone",
+            "certificate_hash": "697d406936846c702115a739478b478f217a4d9a"
+          }
+        },
+        {
           "client_id": "907404957778-q1p6nnoh2aoqnof6nre3ns83cuas8vsh.apps.googleusercontent.com",
           "client_type": 3
         }
