@@ -21,10 +21,10 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import static com.ntu.cz2006.wastegone.Constants.ERROR_DIALOG_REQUEST;
-import static com.ntu.cz2006.wastegone.Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION;
-import static com.ntu.cz2006.wastegone.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
-import static com.ntu.cz2006.wastegone.Constants.PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
+import static com.ntu.wastegone.Constants.ERROR_DIALOG_REQUEST;
+import static com.ntu.wastegone.Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION;
+import static com.ntu.wastegone.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
+import static com.ntu.wastegone.Constants.PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
 
 /**
  MainActivity class initial all API and check permission, then redirect user to the correct page.
@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void navigateMap() {
-        Intent intent = new Intent(this, com.ntu.cz2006.wastegone.ui.MapsActivity.class);
+        Intent intent = new Intent(this, com.ntu.wastegone.ui.MapsActivity.class);
         startActivity(intent);
         finish();
     }
