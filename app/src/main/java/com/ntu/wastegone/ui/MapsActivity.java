@@ -160,7 +160,7 @@ public class MapsActivity extends AppCompatActivity implements
 
         mapMarkerManager = new HashMap<String, Marker>();
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFrame.findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         initUI();

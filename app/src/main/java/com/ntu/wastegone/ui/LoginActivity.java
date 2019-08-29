@@ -25,7 +25,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.ntu.cz3002.wastegone.R;
+import com.ntu.wastegone.R;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -115,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        Intent i = new Intent(getApplicationContext(), com.ntu.cz2006.wastegone.ui.MainActivity.class);
+                        Intent i = new Intent(getApplicationContext(), com.ntu.wastegone.ui.MainActivity.class);
                         startActivity(i);
                         finish();
                         Toast.makeText(getApplicationContext(), "User exist", Toast.LENGTH_SHORT).show();

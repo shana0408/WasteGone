@@ -8,24 +8,19 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.ntu.cz2006.wastegone.R;
-import com.ntu.cz2006.wastegone.adapters.WasteLocationRecyclerAdapter;
-import com.ntu.cz2006.wastegone.models.WasteLocation;
+import com.ntu.wastegone.R;
+import com.ntu.wastegone.adapters.WasteLocationRecyclerAdapter;
+import com.ntu.wastegone.models.WasteLocation;
 
 import java.util.ArrayList;
 import java.util.List;

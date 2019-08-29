@@ -11,7 +11,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.ntu.cz2006.wastegone.R;
+import com.ntu.wastegone.R;
 
 /**
  LogoutActivity class handles user logout
