@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/overview_coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -29,7 +29,7 @@
             app:layout_anchor="@id/submitFormBottomSheet"
             app:layout_anchorGravity="top|end">
 
-            <android.support.design.widget.FloatingActionButton
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/directionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
                 android:visibility="gone"
                 app:backgroundTint="#3A78E7" />
 
-            <android.support.design.widget.FloatingActionButton
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/myLocationButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -50,7 +50,7 @@
                 android:src="@drawable/ic_mylocation"
                 app:backgroundTint="#FFF" />
 
-            <android.support.design.widget.FloatingActionButton
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/toggleBottomSheetButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
 
         <include layout="@layout/submit_bottom_sheet" />
         <include layout="@layout/marker_detail_bottom_sheet" />
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
     <include
@@ -72,7 +72,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <android.support.design.widget.NavigationView
+    <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -81,4 +81,4 @@
         app:headerLayout="@layout/nav_header_side_bar"
         app:menu="@menu/activity_side_bar_drawer" />
 
-</android.support.v4.widget.DrawerLayout>
+</androidx.drawerlayout.widget.DrawerLayout>
