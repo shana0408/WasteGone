@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">WasteGone</string>
     <string name="title_activity_maps">WasteGoneMap</string>
-    <string name="google_map_api_key">AIzaSyBFHXkyEVJrjDXz-0HVMQ5Rv60cNn0Zeko</string>
+    <string name="google_map_api_key">AIzaSyAJdst-ylaZp-KocjcNof1L628cYj2vKSU</string>
+    <string name="default_web_client_id">907404957778-kk1mnubn25nkps41ist4mkpoj768cl80.apps.googleusercontent.com</string>
     <string name="title_activity_login">Sign in</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -25,4 +26,7 @@
     <string name="title_activity_side_bar">SideBarActivity</string>
     <string name="title_activity_request">RequestActivity</string>
     <string name="title_activity_reservation">ReservationActivity</string>
+    <string name="title_activity_reward">RewardActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
 </resources>

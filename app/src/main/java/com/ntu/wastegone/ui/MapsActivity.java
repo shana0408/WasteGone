@@ -145,7 +145,7 @@ public class MapsActivity extends AppCompatActivity implements
     private DrawerLayout drawerLayout;
     private TextView userNameTextView;
     private TextView userEmailTextView;
-    private TextView userRewardsTextView;
+    private MenuItem userRewardsTextView;
     private ImageView userProfileImageView;
 
     private HashMap<String, Marker> mapMarkerManager;
@@ -236,8 +236,9 @@ public class MapsActivity extends AppCompatActivity implements
         View hView = navigationView.getHeaderView(0);
         userNameTextView = hView.findViewById(R.id.userNameTextView);
         userEmailTextView = hView.findViewById(R.id.userEmailTextView);
-        userRewardsTextView = hView.findViewById(R.id.userRewardsTextView);
         userProfileImageView = hView.findViewById(R.id.userProfileImageView);
+
+        userRewardsTextView = navigationView.getMenu().findItem(R.id.userRewardsTextView);
     }
 
     private void loadUserIntoNavigation() {
@@ -247,7 +248,7 @@ public class MapsActivity extends AppCompatActivity implements
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 localUser = documentSnapshot.toObject(User.class);
-                userRewardsTextView.setText("Rewards: " + localUser.getRewards());
+                userRewardsTextView.setTitle(localUser.getRewards() + " Points  •  Rewards");
             }
         });
 
@@ -258,7 +259,7 @@ public class MapsActivity extends AppCompatActivity implements
                     return;
                 }
                 localUser = documentSnapshot.toObject(User.class);
-                userRewardsTextView.setText("Rewards: " + localUser.getRewards());
+                userRewardsTextView.setTitle(localUser.getRewards() + " Points  •  Rewards");
             }
         });
 
@@ -734,23 +735,32 @@ public class MapsActivity extends AppCompatActivity implements
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.nav_request) {
-            Intent i = new Intent(getApplicationContext(), com.ntu.wastegone.ui.RequestActivity.class);
-            i.putExtra("FROM_ACTIVITY", "MapsActivity");
-            startActivity(i);
+        Intent i = null;
+
+        if (id == R.id.userRewardsTextView)
+        {
+            i = new Intent(getApplicationContext(), com.ntu.wastegone.ui.RewardActivity.class);
         }
-        else if (id == R.id.nav_reservation) {
-            Intent i = new Intent(getApplicationContext(), com.ntu.wastegone.ui.ReservationActivity.class);
-            i.putExtra("FROM_ACTIVITY", "MapsActivity");
-            startActivity(i);
+        else if (id == R.id.nav_request)
+        {
+            i = new Intent(getApplicationContext(), com.ntu.wastegone.ui.RequestActivity.class);
         }
-        else if (id == R.id.nav_logout) {
-            Intent i = new Intent(getApplicationContext(),LogoutActivity.class);
-            i.putExtra("FROM_ACTIVITY", "MapsActivity");
-            startActivity(i);
+        else if (id == R.id.nav_reservation)
+        {
+            i = new Intent(getApplicationContext(), com.ntu.wastegone.ui.ReservationActivity.class);
+        }
+        else if (id == R.id.nav_logout)
+        {
+            i = new Intent(getApplicationContext(),LogoutActivity.class);
+        }
+        else
+        {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return false;
         }
 
-        drawerLayout.closeDrawer(GravityCompat.START);
+        i.putExtra("FROM_ACTIVITY", "MapsActivity");
+        startActivity(i);
         return false;
     }
 
