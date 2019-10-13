@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "907404957778",
+    "firebase_url": "https://cz3002-project.firebaseio.com",
+    "project_id": "cz3002-project",
+    "storage_bucket": "cz3002-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:907404957778:android:1cd2ca070e5f9bcf",
+        "android_client_info": {
+          "package_name": "com.ntu.wastegone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "907404957778-301nqnhrtqbvnbpidm0oatapq70nphfg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ntu.wastegone",
+            "certificate_hash": "697d406936846c702115a739478b478f217a4d9a"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJdst-ylaZp-KocjcNof1L628cYj2vKSU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

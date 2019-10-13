@@ -10,16 +10,6 @@
         android:roundIcon="@mipmap/wastegone_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".ui.RewardActivity"
-            android:label="@string/title_activity_reward"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity
-            android:name=".ui.ReservationActivity"
-            android:theme="@style/AppTheme.AppBarLayout" />
-        <activity
-            android:name=".ui.RequestActivity"
-            android:theme="@style/AppTheme.AppBarLayout" />
         <activity android:name=".ui.WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,11 +17,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.ReservationActivity"
+            android:theme="@style/AppTheme.AppBarLayout" />
+        <activity
+            android:name=".ui.RequestActivity"
+            android:theme="@style/AppTheme.AppBarLayout" />
+        <activity
+            android:name=".ui.RewardActivity"
+            android:theme="@style/AppTheme.AppBarLayout"/>
+
         <activity android:name=".ui.LogoutActivity" />
         <activity android:name=".ui.LoginActivity" />
         <activity android:name=".ui.MainActivity" />
         <activity android:name=".ui.MapsActivity" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_map_api_key" />
