@@ -7,16 +7,11 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.viewpager.widget.ViewPager;
 
 import android.view.MenuItem;
-import android.view.View;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,7 +21,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.ntu.wastegone.R;
 import com.ntu.wastegone.adapters.WasteLocationRecyclerAdapter;
 import com.ntu.wastegone.models.WasteLocation;
-import com.ntu.wastegone.ui.main.SectionsPagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

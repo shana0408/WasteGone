@@ -1,4 +1,4 @@
-package com.ntu.wastegone.ui.main;
+package com.ntu.wastegone.ui.ui.main;
 
 import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;

@@ -1,4 +1,4 @@
-package com.ntu.wastegone.ui.main;
+package com.ntu.wastegone.ui.ui.main;
 
 import android.content.Context;
 
@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
-import com.ntu.wastegone.R;
+import com.ntu.wastegone.ui.R;
 
 /**
  * A [FragmentPagerAdapter] that returns a fragment corresponding to
