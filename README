@@ -1,0 +1,38 @@
+#WasteGone
+
+
+### Setup Guide
+
+ - Visit https://github.com/shana0408/WasteGone
+
+ - Download source code from release
+
+ - Download Android Studio
+ 
+ - Import as existing project
+ 
+ - To build this, you will need google-services.json , which is not provide here due to security reason.
+ 
+ - Contact us to obtain google-services.json if you wish to run this.
+
+## Class Definetion 
+
+ - Visit java doc
+ 
+## Jenkins Setup - CI process
+
+ - visit https://jenkins.shana.cc
+   username: admin
+   password: 3183fea63fc149d38319bbc2963f6ae2
+ 
+ - I'm just using laptop to host this 24x7 with no redundancy. Contact yongseng.chua@hotmail.com if the url is unable to access.
+ 
+ - This is just a demostration on how we are using jenkins to build CI process on this project.
+   My real jenkins server is on local device but not this. 
+  
+ - For WasteGone2.0
+   Visit https://jenkins.shana.cc/job/WasteGone2.0/
+   - Jenkins is checking https://github.com/shana0408/WasteGone.git every 5 minutes if there is a new commit on github
+     If new commit detected, pull data, use gradle wrapper to build, check if build successful and send email to yongseng.chua@hotmail.com
+   - Take note SMTP is not configured.
+   - You have free access to change/edit anything on this jenkins. 
