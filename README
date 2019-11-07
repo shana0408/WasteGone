@@ -50,5 +50,7 @@
    Visit https://jenkins.shana.cc/job/WasteGone2.0/
    - Jenkins is checking https://github.com/shana0408/WasteGone.git every 5 minutes if there is a new commit on github
      If new commit detected, pull data, use gradle wrapper to build, check if build successful and send email to yongseng.chua@hotmail.com
+     
    - Take note SMTP is not configured.
+   
    - You have free access to change/edit anything on this jenkins. 
